@@ -55,6 +55,7 @@ module Ultra.System.Verified.IO (
     ,   doesNotExist
     ,   existsAsDir
     ,   existsAsFile
+    ,   listDirectory
     ,   openNewBinaryFile
     ,   openVerifiedBinaryFile
     ,   removeVerifiedDirectoryRecursive
@@ -233,6 +234,16 @@ createDirectory
 createDirectory dirName = do
     (liftIO $ D.createDirectory (T.unpack dirName)) `catch` (newDirErrorHandler dirName)
     pure . VerifiedDirPath $ dirName
+
+-- |
+-- does not include @./@ and @../@
+listDirectory
+    :: (MonadIO m)
+    => VerifiedDirPath
+    -> m [T.Text] -- ^ Their existence is "verified" but you dont know if they are files or directories, once i have used this a bit ill see if there is a useful type to use here...
+listDirectory (VerifiedDirPath p) = do
+    ds <- liftIO $ D.listDirectory (T.unpack p)
+    pure (T.pack <$> ds)
 
 createDirectoryIfMissing
     :: (MonadCatch m, MonadIO m)
