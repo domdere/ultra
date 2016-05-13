@@ -1,0 +1,69 @@
+name:               ultra-core
+version:            0.0.1
+license:            BSD3
+license-file:       etc/LICENCE.md
+author:             Dom De Re
+maintainer:         Dom De Re
+copyright:          Copyright (C) 2014
+synopsis:           Ultra base
+category:           Data
+description:        Ultra Base
+homepage:           https://github.com/domdere/ultra/issues
+bug-reports:        https://github.com/domdere/ultra/issues
+cabal-version:      >= 1.18
+build-type:         Custom
+--extra-source-files: etc/CONTRIBUTORS,
+--                    etc/CREDITS
+
+source-repository       head
+    type:               git
+    location:           https://github.com/domdere/ultra/ultra-base
+
+flag                    small_base
+    description:        Choose the new, split-up base package.
+
+library
+    default-language:   Haskell2010
+
+    build-depends:      base < 5 && >= 4
+                    ,   containers
+                    ,   array
+                    ,   preamble
+
+    ghc-options:        -Wall
+
+    hs-source-dirs:     src
+                        gen
+
+    exposed-modules:    BuildInfo_ultra_core
+                        Ultra.Preamble
+                        Ultra.Control.Applicative
+                        Ultra.Data.Either
+                        Ultra.Data.Foldable
+                        Ultra.Data.List
+
+    default-extensions: NoImplicitPrelude
+
+test-suite              quickcheck
+    default-language:   Haskell2010
+    type:               exitcode-stdio-1.0
+    main-is:            Main.hs
+    hs-source-dirs:     quickcheck
+    build-depends:      base                >= 4 && < 5
+                    ,   lab-core
+                    ,   preamble
+                    ,   QuickCheck          == 2.8.*
+                    ,   ultra-either
+                    ,   ultra-core
+
+
+    default-extensions: NoImplicitPrelude
+                        TemplateHaskell
+
+test-suite              hlint
+    default-language:   Haskell2010
+    type:               exitcode-stdio-1.0
+    main-is:            Main.hs
+    hs-source-dirs:     hlint
+    build-depends:      base
+                    ,   hlint               == 1.9.*

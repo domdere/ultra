@@ -1,0 +1,62 @@
+name:               ultra-cli
+version:            0.0.1
+license:            BSD3
+license-file:       etc/LICENCE.md
+author:             Dom De Re
+maintainer:         Dom De Re
+copyright:          Copyright (C) 2014
+synopsis:           CLI related functions
+category:           System
+description:        CLI related functions
+homepage:           https://github.com/domdere/ultra/issues
+bug-reports:        https://github.com/domdere/ultra/issues
+cabal-version:      >= 1.18
+build-type:         Custom
+--extra-source-files: etc/CONTRIBUTORS,
+--                    etc/CREDITS
+
+source-repository       head
+    type:               git
+    location:           https://github.com/domdere/ultra
+
+flag                    small_base
+    description:        Choose the new, split-up base package.
+
+library
+    default-language:   Haskell2010
+
+    build-depends:      base < 5 && >= 4
+                    ,   containers
+                    ,   array
+                    ,   bytestring              == 0.10.*
+                    ,   preamble
+                    ,   ultra-either
+                    ,   ultra-text
+
+    ghc-options:        -Wall
+
+    hs-source-dirs:     src
+                        gen
+
+    exposed-modules:    BuildInfo_ultra_cli
+                        Ultra.Cli
+                        Ultra.Cli.Data
+
+    default-extensions: NoImplicitPrelude
+
+test-suite              quickcheck
+    default-language:   Haskell2010
+    type:               exitcode-stdio-1.0
+    main-is:            Main.hs
+    hs-source-dirs:     quickcheck
+    build-depends:      base                >= 4 && < 5
+                    ,   QuickCheck          == 2.8.*
+                    ,   ultra-cli
+
+test-suite              hlint
+    default-language:   Haskell2010
+    type:               exitcode-stdio-1.0
+    main-is:            Main.hs
+    hs-source-dirs:     hlint
+    build-depends:      base
+                    ,   hlint               == 1.9.*

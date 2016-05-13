@@ -1,0 +1,67 @@
+name:               ultra-conduit
+version:            0.0.1
+license:            BSD3
+license-file:       etc/LICENCE.md
+author:             Dom De Re
+maintainer:         Dom De Re
+copyright:          Copyright (C) 2014
+synopsis:           `conduit` done `ultra`, in practice this mostly is just about pulling out those damn exceptions and injecting them into `EitherT`.  "Best Practices" my ass FPComplete
+category:           Data
+description:        `conduit` done `ultra`, in practice this mostly is just about pulling out those damn exceptions and injecting them into `EitherT`.  "Best Practices" my ass FPComplete
+homepage:           https://github.com/domdere/ultra/issues
+bug-reports:        https://github.com/domdere/ultra/issues
+cabal-version:      >= 1.18
+build-type:         Custom
+--extra-source-files: etc/CONTRIBUTORS,
+--                    etc/CREDITS
+
+source-repository       head
+    type:               git
+    location:           https://github.com/domdere/ultra
+
+flag                    small_base
+    description:        Choose the new, split-up base package.
+
+library
+    default-language:   Haskell2010
+
+    build-depends:      base < 5 && >= 4
+                    ,   containers
+                    ,   array
+                    ,   conduit         == 1.2.*
+                    ,   conduit-extra   == 1.1.*
+                    ,   preamble
+                    ,   ultra-either
+                    ,   ultra-text
+
+    ghc-options:        -Wall
+
+    hs-source-dirs:     src
+                        gen
+
+    exposed-modules:    BuildInfo_ultra_conduit
+                        Ultra.Data.Conduit
+                        Ultra.Data.Conduit.Binary
+                        Ultra.Data.Conduit.List
+                        Ultra.Data.Conduit.Text
+
+    default-extensions: NoImplicitPrelude
+
+test-suite              quickcheck
+    default-language:   Haskell2010
+    type:               exitcode-stdio-1.0
+    main-is:            Main.hs
+    hs-source-dirs:     test
+    build-depends:      base                >= 4 && < 5
+                    ,   lab-core
+                    ,   preamble
+                    ,   ultra-conduit
+
+test-suite              hlint
+    default-language:   Haskell2010
+    type:               exitcode-stdio-1.0
+    main-is:            Main.hs
+    hs-source-dirs:     hlint
+    build-depends:      base
+                    ,   hlint               == 1.9.*
+

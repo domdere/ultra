@@ -1,0 +1,72 @@
+name:               ultra-io
+version:            0.0.1
+license:            BSD3
+license-file:       etc/LICENCE.md
+author:             Dom De Re
+maintainer:         Dom De Re
+copyright:          Copyright (C) 2014
+synopsis:           Ultra IO, with EitherT the way it was supposed to be
+category:           Data
+description:        Ultra IO, with EitherT the way it was supposed to be
+homepage:           https://github.com/domdere/ultra/issues
+bug-reports:        https://github.com/domdere/ultra/issues
+cabal-version:      >= 1.18
+build-type:         Custom
+--extra-source-files: etc/CONTRIBUTORS,
+--                    etc/CREDITS
+
+source-repository       head
+    type:               git
+    location:           https://github.com/domdere/ultra
+
+flag                    small_base
+    description:        Choose the new, split-up base package.
+
+library
+    default-language:   Haskell2010
+
+    build-depends:      base < 5 && >= 4
+                    ,   containers
+                    ,   array
+                    ,   directory               == 1.2.*
+                    ,   preamble
+                    ,   ultra-either
+                    ,   ultra-exceptions
+                    ,   ultra-text
+
+    ghc-options:        -Wall
+
+    hs-source-dirs:     src
+                        gen
+
+    exposed-modules:    BuildInfo_ultra_io
+                        Ultra.System.IO
+                        Ultra.System.IO.Error
+                        Ultra.System.IO.Handlers
+                        Ultra.System.Verified.IO
+                        Ultra.System.Verified.IO.Error
+                        Ultra.System.Verified.IO.Handlers
+
+    default-extensions: NoImplicitPrelude
+
+test-suite              quickcheck
+    default-language:   Haskell2010
+    type:               exitcode-stdio-1.0
+    main-is:            Main.hs
+    hs-source-dirs:     test
+    build-depends:      base                >= 4 && < 5
+                    ,   lab-core
+                    ,   preamble
+                    ,   ultra-io
+
+    default-extensions: NoImplicitPrelude
+                        TemplateHaskell
+
+
+test-suite              hlint
+    default-language:   Haskell2010
+    type:               exitcode-stdio-1.0
+    main-is:            Main.hs
+    hs-source-dirs:     hlint
+    build-depends:      base
+                    ,   hlint               == 1.9.*
