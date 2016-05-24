@@ -1,23 +1,23 @@
 name:               ultra-optparse
 version:            0.0.1
 license:            BSD3
-license-file:       etc/LICENCE.md
+license-file:       ../etc/LICENCE.md
 author:             Dom De Re
 maintainer:         Dom De Re
 copyright:          Copyright (C) 2015
 synopsis:           `optparse-applicative`, but `ultra`
 category:           Data
 description:        `optparse-applicative` done `ultra`
-homepage:           https://github.com/domdere/ultra/issues
+homepage:           https://github.com/domdere/ultra
 bug-reports:        https://github.com/domdere/ultra/issues
 cabal-version:      >= 1.18
-build-type:         Custom
+build-type:         Simple
 --extra-source-files: etc/CONTRIBUTORS,
 --                    etc/CREDITS
 
 source-repository       head
     type:               git
-    location:           https://github.com/domdere/ultra
+    location:           https://github.com/domdere/ultra.git
 
 flag                    small_base
     description:        Choose the new, split-up base package.
@@ -36,10 +36,8 @@ library
     ghc-options:        -Wall
 
     hs-source-dirs:     src
-                        gen
 
-    exposed-modules:    BuildInfo_ultra_optparse
-                        Ultra.Options.Applicative
+    exposed-modules:    Ultra.Options.Applicative
 
 test-suite              quickcheck
     default-language:   Haskell2010
@@ -50,12 +48,3 @@ test-suite              quickcheck
                     ,   lab-core
                     ,   preamble
                     ,   ultra-optparse
-
-
-test-suite              hlint
-    default-language:   Haskell2010
-    type:               exitcode-stdio-1.0
-    main-is:            Main.hs
-    hs-source-dirs:     hlint
-    build-depends:      base
-                    ,   hlint               == 1.9.*

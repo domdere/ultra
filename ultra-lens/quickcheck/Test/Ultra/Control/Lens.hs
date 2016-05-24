@@ -9,6 +9,7 @@
 module Test.Ultra.Control.Lens where
 
 import Ultra.Control.Lens
+import Ultra.Control.Monad.Trans.Either (EitherT, left)
 
 import Lab.Control.Lens
 

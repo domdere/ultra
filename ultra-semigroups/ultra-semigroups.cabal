@@ -1,23 +1,23 @@
 name:               ultra-semigroups
 version:            0.0.1
 license:            BSD3
-license-file:       etc/LICENCE.md
+license-file:       ../etc/LICENCE.md
 author:             Dom De Re
 maintainer:         Dom De Re
-copyright:          Copyright (C) 2014
+copyright:          Copyright (C) 2014-2016
 synopsis:           Ultra Semigroups
 category:           Data
 description:        Ultra Semigroups
-homepage:           https://github.com/domdere/ultra/issues
+homepage:           https://github.com/domdere/ultra
 bug-reports:        https://github.com/domdere/ultra/issues
 cabal-version:      >= 1.18
-build-type:         Custom
+build-type:         Simple
 --extra-source-files: etc/CONTRIBUTORS,
 --                    etc/CREDITS
 
 source-repository       head
     type:               git
-    location:           https://github.com/domdere/ultra/ultra-semigroups
+    location:           https://github.com/domdere/ultra/ultra-semigroups.git
 
 flag                    small_base
     description:        Choose the new, split-up base package.
@@ -34,10 +34,8 @@ library
     ghc-options:        -Wall
 
     hs-source-dirs:     src
-                        gen
 
-    exposed-modules:    BuildInfo_ultra_semigroups
-                        Ultra.Data.List.NonEmpty
+    exposed-modules:    Ultra.Data.List.NonEmpty
 
     default-extensions: NoImplicitPrelude
 
@@ -53,12 +51,3 @@ test-suite              quickcheck
 
     default-extensions: NoImplicitPrelude
                         TemplateHaskell
-
-
-test-suite              hlint
-    default-language:   Haskell2010
-    type:               exitcode-stdio-1.0
-    main-is:            Main.hs
-    hs-source-dirs:     hlint
-    build-depends:      base
-                    ,   hlint               == 1.9.*

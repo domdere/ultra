@@ -4,20 +4,20 @@ license:            BSD3
 license-file:       etc/LICENCE.md
 author:             Dom De Re
 maintainer:         Dom De Re
-copyright:          Copyright (C) 2015
+copyright:          Copyright (C) 2014-2016
 synopsis:           Either, but more Ultra
 category:           Data
 description:        Either, but more Ultra
 homepage:           https://github.com/domdere/ultra/issues
 bug-reports:        https://github.com/domdere/ultra/issues
 cabal-version:      >= 1.18
-build-type:         Custom
+build-type:         Simple
 --extra-source-files: etc/CONTRIBUTORS,
 --                    etc/CREDITS
 
 source-repository       head
     type:               git
-    location:           https://github.com/domdere/ultra
+    location:           https://github.com/domdere/ultra.git
 
 flag                    small_base
     description:        Choose the new, split-up base package.
@@ -34,12 +34,8 @@ library
     ghc-options:        -Wall
 
     hs-source-dirs:     src
-                        gen
 
-    exposed-modules:    BuildInfo_ultra_either
-                        Ultra.Control.Monad.Trans.Either
-
-    default-extensions: NoImplicitPrelude
+    exposed-modules:    Ultra.Control.Monad.Trans.Either
 
 test-suite              quickcheck
     default-language:   Haskell2010
@@ -53,11 +49,3 @@ test-suite              quickcheck
 
     default-extensions: NoImplicitPrelude
                         TemplateHaskell
-
-test-suite              hlint
-    default-language:   Haskell2010
-    type:               exitcode-stdio-1.0
-    main-is:            Main.hs
-    hs-source-dirs:     hlint
-    build-depends:      base
-                    ,   hlint               == 1.9.*
