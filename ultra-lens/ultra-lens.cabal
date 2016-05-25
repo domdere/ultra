@@ -1,7 +1,7 @@
 name:               ultra-lens
 version:            0.0.1
 license:            BSD3
-license-file:       etc/LICENCE.md
+license-file:       ../etc/LICENCE.md
 author:             Dom De Re
 maintainer:         Dom De Re
 copyright:          Copyright (C) 2014
@@ -11,7 +11,7 @@ description:        Ultra Lens
 homepage:           https://github.com/domdere/ultra/issues
 bug-reports:        https://github.com/domdere/ultra/issues
 cabal-version:      >= 1.18
-build-type:         Custom
+build-type:         Simple
 --extra-source-files: etc/CONTRIBUTORS,
 --                    etc/CREDITS
 
@@ -36,10 +36,8 @@ library
     ghc-options:        -Wall
 
     hs-source-dirs:     src
-                        gen
 
-    exposed-modules:    BuildInfo_ultra_lens
-                        Ultra.Control.Lens
+    exposed-modules:    Ultra.Control.Lens
                         Ultra.Data.List.Lens
 
     default-extensions: NoImplicitPrelude
@@ -54,16 +52,8 @@ test-suite              quickcheck
                     ,   lab-lens
                     ,   preamble
                     ,   QuickCheck          == 2.8.*
+                    ,   ultra-either
                     ,   ultra-lens
 
     default-extensions: NoImplicitPrelude
                         TemplateHaskell
-
-
-test-suite              hlint
-    default-language:   Haskell2010
-    type:               exitcode-stdio-1.0
-    main-is:            Main.hs
-    hs-source-dirs:     hlint
-    build-depends:      base
-                    ,   hlint               == 1.9.*

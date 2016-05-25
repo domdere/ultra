@@ -16,9 +16,11 @@ ${SANDBOX}: ${SUBMODULE_DEPS}
 	cabal sandbox init
 	cabal sandbox add-source ../lib/lab/lab-core
 	cabal sandbox add-source ../lib/preamble
+	cabal sandbox add-source ../ultra-core
 	cabal sandbox add-source ../ultra-either
 	cabal sandbox add-source ../ultra-exceptions
 	cabal sandbox add-source ../ultra-lens
+	cabal sandbox add-source ../ultra-text
 
 ${DEPS}: ${SANDBOX} $(wildcard *.cabal)
 	cabal install -j --only-dependencies --enable-tests

@@ -13,7 +13,7 @@ module Ultra.Control.Monad.Catch.Lens (
     ) where
 
 import Ultra.Control.Lens (Iso', (^.), from)
-import Ultra.Control.Monad.Catch
+import Ultra.Control.Monad.Bracket (VBracket, liftVBracket)
 
 isoVBracket :: (forall a. Iso' (m a) (n a)) -> VBracket m -> VBracket n
 isoVBracket i = liftVBracket (^. i) (^. from i)

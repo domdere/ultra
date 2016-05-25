@@ -1,17 +1,17 @@
 name:               ultra-exceptions-lens
 version:            0.0.1
 license:            BSD3
-license-file:       etc/LICENCE.md
+license-file:       ../etc/LICENCE.md
 author:             Dom De Re
 maintainer:         Dom De Re
-copyright:          Copyright (C) 2014
+copyright:          Copyright (C) 2014-2016
 synopsis:           Ultra exceptions with lens
 category:           Data
 description:        Ultra exceptions with lens
 homepage:           https://github.com/domdere/ultra/issues
 bug-reports:        https://github.com/domdere/ultra/issues
 cabal-version:      >= 1.18
-build-type:         Custom
+build-type:         Simple
 --extra-source-files: etc/CONTRIBUTORS,
 --                    etc/CREDITS
 
@@ -35,10 +35,8 @@ library
     ghc-options:        -Wall
 
     hs-source-dirs:     src
-                        gen
 
-    exposed-modules:    BuildInfo_ultra_exceptions_lens
-                        Ultra.Control.Monad.Catch.Lens
+    exposed-modules:    Ultra.Control.Monad.Catch.Lens
 
     default-extensions: NoImplicitPrelude
 
@@ -54,11 +52,3 @@ test-suite              quickcheck
 
     default-extensions: NoImplicitPrelude
                         TemplateHaskell
-
-test-suite              hlint
-    default-language:   Haskell2010
-    type:               exitcode-stdio-1.0
-    main-is:            Main.hs
-    hs-source-dirs:     hlint
-    build-depends:      base
-                    ,   hlint               == 1.9.*
