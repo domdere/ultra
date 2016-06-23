@@ -16,6 +16,7 @@ module Ultra.Control.Monad.Trans.Either (
     -- * Original EitherT Functions
     ,   runEitherT
     ,   eitherT
+    ,   firstEitherT
     ,   hoistEither
     ,   left
     ,   mapEitherT
@@ -41,6 +42,9 @@ left = throwE
 
 bimapEitherT :: (Functor m) => (e -> e') -> (a -> b) -> EitherT e m a -> EitherT e' m b
 bimapEitherT l r = EitherT . fmap (bimap l r) . runEitherT
+
+firstEitherT :: (Functor m) => (e -> e') -> EitherT e m a -> EitherT e' m a
+firstEitherT f = bimapEitherT f id
 
 mapEitherT :: (m (Either e a) -> n (Either e' b)) -> EitherT e m a -> EitherT e' n b
 mapEitherT f (ExceptT mx) = ExceptT $ f mx
