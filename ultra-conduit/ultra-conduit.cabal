@@ -41,6 +41,9 @@ library
     exposed-modules:    Ultra.Data.Conduit
                         Ultra.Data.Conduit.Binary
                         Ultra.Data.Conduit.List
+                        Ultra.Data.Conduit.Network
+                        Ultra.Data.Conduit.Network.UDP
+                        Ultra.Data.Conduit.Network.Unix
                         Ultra.Data.Conduit.Text
 
     default-extensions: NoImplicitPrelude
