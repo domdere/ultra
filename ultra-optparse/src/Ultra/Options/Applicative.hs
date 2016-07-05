@@ -18,6 +18,8 @@ module Ultra.Options.Applicative (
     ,   dryrun
     ,   eitherTextReader
     ,   envvar
+    ,   envvarWithDefault
+    ,   envvarWithDefaultWithRender
     ,   shimTextParser
     ,   bverbosity
     ,   verbosity
@@ -81,9 +83,40 @@ envvar
     -> T.Text
     -> T.Text
     -> X.Mod f a
-envvar f envs env h =
+envvar = envvar' mempty
+
+envvarWithDefault
+    :: (HasValue f, Show a)
+    => (T.Text -> Maybe a)
+    -> [(T.Text, T.Text)]
+    -> T.Text
+    -> a
+    -> T.Text
+    -> X.Mod f a
+envvarWithDefault f envs env def h = envvar' (value def <> showDefault) f envs env h
+
+envvarWithDefaultWithRender
+    :: (HasValue f)
+    => (T.Text -> Maybe a)
+    -> (a -> T.Text)
+    -> [(T.Text, T.Text)]
+    -> T.Text
+    -> a
+    -> T.Text
+    -> X.Mod f a
+envvarWithDefaultWithRender f render envs env def h = envvar' (value def <> showDefaultWith (T.unpack . render)) f envs env h
+
+envvar'
+    :: (HasValue f)
+    => X.Mod f a
+    -> (T.Text -> Maybe a)
+    -> [(T.Text, T.Text)]
+    -> T.Text
+    -> T.Text
+    -> X.Mod f a
+envvar' ifEmpty f envs env h =
     let
-        o = maybe mempty value (L.lookup env envs >>= f)
+        o = maybe ifEmpty value (L.lookup env envs >>= f)
     in mappend o . help . T.unpack . T.concat $ [
             h
         ,   " (can be set via environment variable "
