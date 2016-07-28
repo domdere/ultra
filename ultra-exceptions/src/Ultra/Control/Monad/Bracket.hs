@@ -316,19 +316,31 @@ strictBracketEitherT
   -> (a -> EitherT e' m b)    -- ^ use
   -> EitherT (StrictBracketError b e e' e'') m (c, b)
 strictBracketEitherT acquire release use =
-    let
-        release' :: a -> EitherT e m (Either e'' c)
-        release' = lift . runEitherT . release
+  let
+    release' :: a -> EitherT e m (Either e'' c)
+    release' = lift . runEitherT . release
 
-        use' :: a -> EitherT e m (Either e' b)
-        use' = lift . runEitherT . use
+    use' :: a -> EitherT e m (Either e' b)
+    use' = lift . runEitherT . use
 
-        resolveErrors :: Either e (Either e'' c, Either e' b) -> Either (StrictBracketError b e e' e'') (c, b)
-        resolveErrors (Left err)                        = Left $ AcquireFailed err
-        resolveErrors (Right (Left rel, Left inner))    = Left $ UseFailedAndResourceLeak inner rel
-        resolveErrors (Right (Left rel, Right inner))   = Left $ UseSucceededButResourceLeak inner rel
-        resolveErrors (Right (Right _, Left inner))     = Left $ UseFailed inner
-        resolveErrors (Right (Right rel, Right inner))  = Right (rel, inner)
-    in EitherT . fmap resolveErrors . runEitherT $ evbracket acquire release' use'
+    resolveErrors :: Either e (Either e'' c, Either e' b) -> Either (StrictBracketError b e e' e'') (c, b)
+    resolveErrors (Left err)                        = Left $ AcquireFailed err
+    resolveErrors (Right (Left rel, Left inner))    = Left $ UseFailedAndResourceLeak inner rel
+    resolveErrors (Right (Left rel, Right inner))   = Left $ UseSucceededButResourceLeak inner rel
+    resolveErrors (Right (Right _, Left inner))     = Left $ UseFailed inner
+    resolveErrors (Right (Right rel, Right inner))  = Right (rel, inner)
+  in EitherT . fmap resolveErrors . runEitherT $ evbracket acquire release' use'
 
-
+weakBracketEitherT
+  :: forall m e e' e'' a b c. (MonadBracket m)
+  => EitherT  e m a          -- ^ acquire
+  -> (a -> EitherT e'' m c)  -- ^ release
+  -> (a -> EitherT e' m b)   -- ^ use
+  -> EitherT (WeakBracketError e e' e'') m (WeakBracketResult e'' c b)
+weakBracketEitherT acquire release use = EitherT $
+ flip fmap (runEitherT (strictBracketEitherT acquire release use)) $ \case
+    Left (AcquireFailed e) -> Left $ WeakCouldNotAcquire e
+    Left (UseFailedAndResourceLeak useError releaseError) -> Left $ WeakUseFailedAndResourceLeak useError releaseError
+    Left (UseSucceededButResourceLeak x releaseError) -> pure $ ResourceLeak releaseError x
+    Left (UseFailed useError) -> Left $ WeakUseFailed useError
+    Right (x, y) -> pure $ AllOk x y
