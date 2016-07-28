@@ -13,29 +13,30 @@
 --
 -------------------------------------------------------------------
 module Ultra.Control.Monad.Bracket (
-    -- * Type Classes
-        MonadBracket(..)
-    -- * Types
-    ,   StrictBracketError(..)
-    ,   WeakBracketError(..)
-    ,   MaskedBracketT(..)
-    ,   SVBracket
-    ,   SVBracket'
-    ,   VBracket
-    ,   VBracket'
-    -- * Functions
-    ,   esvbracket
-    ,   liftSVBracket
-    ,   liftVBracket
-    ,   renderStrictBracketError
-    ,   runWeakBracketResult
-    -- ** MonadBracket Functions
-    ,   evbracket
-    ,   vbracket
-    ,   bracket'
-    ,   ebracket
-    ,   strictBracketEitherT
-    ) where
+  -- * Type Classes
+    MonadBracket(..)
+  -- * Types
+  , StrictBracketError(..)
+  , WeakBracketError(..)
+  , MaskedBracketT(..)
+  , SVBracket
+  , SVBracket'
+  , VBracket
+  , VBracket'
+  -- * Functions
+  , esvbracket
+  , liftSVBracket
+  , liftVBracket
+  , renderStrictBracketError
+  , runWeakBracketResult
+  -- ** MonadBracket Functions
+  , evbracket
+  , vbracket
+  , bracket'
+  , ebracket
+  , strictBracketEitherT
+  , weakBracketEitherT
+  ) where
 
 import Ultra.Control.Monad.Catch (MonadCatch(..), MonadThrow(..), MonadMask(..), maskedBracket)
 import Ultra.Control.Monad.Trans.Either (EitherT, pattern EitherT, runEitherT)
@@ -79,25 +80,24 @@ type VBracket m = forall a b c. VBracket' m a b c
 -- error handler.
 --
 data StrictBracketError b e e' e'' =
-        AcquireFailed e
-    |   UseFailedAndResourceLeak e' e''
-    |   UseSucceededButResourceLeak b e''
-    |   UseFailed e'
-        deriving (Show, Eq)
+    AcquireFailed e
+  | UseFailedAndResourceLeak e' e''
+  | UseSucceededButResourceLeak b e''
+  | UseFailed e'
+    deriving (Show, Eq)
 
 renderStrictBracketError
-    :: (b -> T.Text)
-    -> (e -> T.Text)
-    -> (e' -> T.Text)
-    -> (e'' -> T.Text)
-    -> StrictBracketError b e e' e''
-    -> T.Text
-renderStrictBracketError renderUseResult renderAcquireError renderUseError renderReleaseError =
-    \case
-        AcquireFailed acquireError                          -> T.concat ["failed to acquire resource: ", renderAcquireError acquireError]
-        UseFailedAndResourceLeak useError releaseError      -> T.concat ["encountered error: '", renderUseError useError, "' and could not free resource either: '", renderReleaseError releaseError, "'"]
-        UseSucceededButResourceLeak useResult releaseError  -> T.concat ["Successfully got result ('", renderUseResult useResult, "') but encountered error releasing resource: '", renderReleaseError releaseError, "'"]
-        UseFailed useError                                  -> renderUseError useError
+  :: (b -> T.Text)
+  -> (e -> T.Text)
+  -> (e' -> T.Text)
+  -> (e'' -> T.Text)
+  -> StrictBracketError b e e' e''
+  -> T.Text
+renderStrictBracketError renderUseResult renderAcquireError renderUseError renderReleaseError = \case
+  AcquireFailed acquireError                          -> T.concat ["failed to acquire resource: ", renderAcquireError acquireError]
+  UseFailedAndResourceLeak useError releaseError      -> T.concat ["encountered error: '", renderUseError useError, "' and could not free resource either: '", renderReleaseError releaseError, "'"]
+  UseSucceededButResourceLeak useResult releaseError  -> T.concat ["Successfully got result ('", renderUseResult useResult, "') but encountered error releasing resource: '", renderReleaseError releaseError, "'"]
+  UseFailed useError                                  -> renderUseError useError
 
 
 -- |
@@ -106,15 +106,15 @@ renderStrictBracketError renderUseResult renderAcquireError renderUseError rende
 -- see `WeakBracketResult` for the other possibilities.
 --
 data WeakBracketError e e' e'' =
-        WeakCouldNotAcquire e
-    |   WeakUseFailedAndResourceLeak e' e''
-    |   WeakUseFailed e'
-        deriving (Show, Eq)
+    WeakCouldNotAcquire e
+  | WeakUseFailedAndResourceLeak e' e''
+  | WeakUseFailed e'
+    deriving (Show, Eq)
 
 data WeakBracketResult e' c b =
-        AllOk c b
-    |   ResourceLeak e' b
-        deriving (Show, Eq)
+    AllOk c b
+  | ResourceLeak e' b
+    deriving (Show, Eq)
 
 -- |
 -- This is the intended use pattern for `WeakBracketResult`,
@@ -122,26 +122,26 @@ data WeakBracketResult e' c b =
 -- moving on, preferably something more than @const $ return ()@.
 --
 runWeakBracketResult
-    :: (Monad m)
-    => WeakBracketResult e' c b
-    -> (e' -> m ())
-    -> (Maybe c -> b -> m a)
-    -> m a
+  :: (Monad m)
+  => WeakBracketResult e' c b
+  -> (e' -> m ())
+  -> (Maybe c -> b -> m a)
+  -> m a
 runWeakBracketResult (AllOk x y) _ f            = f (pure x) y
 runWeakBracketResult (ResourceLeak err y) e f   = e err >> f Nothing y
 
 liftSVBracket
-    :: (forall a. m a -> n a)
-    -> (forall a. n a -> m a)
-    -> SVBracket m
-    -> SVBracket n
+  :: (forall a. m a -> n a)
+  -> (forall a. n a -> m a)
+  -> SVBracket m
+  -> SVBracket n
 liftSVBracket to fro svb acquire release use = to $ svb (fro acquire) ((fro .) . release) (fro . use)
 
 liftVBracket
-    :: (forall a. m a -> n a)
-    -> (forall a. n a -> m a)
-    -> VBracket m
-    -> VBracket n
+  :: (forall a. m a -> n a)
+  -> (forall a. n a -> m a)
+  -> VBracket m
+  -> VBracket n
 liftVBracket to fro vb acquire release use = to $ vb (fro acquire) (fro . release) (fro . use)
 
 -- |
@@ -160,56 +160,56 @@ liftVBracket to fro vb acquire release use = to $ vb (fro acquire) (fro . releas
 -- laws :(
 --
 class (Monad m) => MonadBracket m where
-    svbracket :: SVBracket m
+  svbracket :: SVBracket m
 
 newtype MaskedBracketT m a = MaskedBracketT {
-        runMaskedBracketT :: m a
-    }   deriving (Functor, Applicative, Monad, MonadCatch, MonadIO, MonadThrow)
+    runMaskedBracketT :: m a
+  } deriving (Functor, Applicative, Monad, MonadCatch, MonadIO, MonadThrow)
 
 instance MonadBracket Identity where
-    svbracket acquire release use = do
-        r <- acquire
-        x <- use r
-        y <- release (pure x) r
-        pure (y, x)
+  svbracket acquire release use = do
+    r <- acquire
+    x <- use r
+    y <- release (pure x) r
+    pure (y, x)
 
 instance MonadBracket IO where
-    svbracket = maskedBracket
+  svbracket = maskedBracket
 
 instance (MonadMask m) => MonadBracket (MaskedBracketT m) where
-    svbracket = liftSVBracket MaskedBracketT runMaskedBracketT maskedBracket
+  svbracket = liftSVBracket MaskedBracketT runMaskedBracketT maskedBracket
 
 instance (MonadBracket m) => MonadBracket (ExceptT e m) where
-    svbracket = esvbracket svbracket
+  svbracket = esvbracket svbracket
 
 -- This sucks, `VBracket` can be modified to allow this to
 -- be derived from MonadBracket instead of MonadMask though,
 -- the release function must be modified to be @Maybe b -> a -> m c@,
 -- so that the state can be threaded through...
 instance (MonadBracket m) => MonadBracket (StateT s m) where
-    svbracket = stateTBracket svbracket
+  svbracket = stateTBracket svbracket
 
 instance (MonadBracket m) => MonadBracket (ReaderT r m) where
-    svbracket acquire release use = ReaderT $ \r ->
-        let
-            f = flip runReaderT r
-        in svbracket (f acquire) (\my x -> f $ release my x) (f . use)
+  svbracket acquire release use = ReaderT $ \r ->
+    let
+      f = flip runReaderT r
+    in svbracket (f acquire) (\my x -> f $ release my x) (f . use)
 
 instance (Monoid w, MonadBracket m) => MonadBracket (WriterT w m) where
-    svbracket acquire release use =
-        let
-            release' my (r, w1) = runWriterT $ do
-                -- If the result is nothing, the "use" failed, and the writer output
-                -- of the acquire has not been accumulated,
-                -- If there is a result, dont have to use the acquire writer result, its
-                -- already included in @w2@
-                tell $ maybe w1 snd my
-                release (fst <$> my) r
+  svbracket acquire release use =
+    let
+      release' my (r, w1) = runWriterT $ do
+        -- If the result is nothing, the "use" failed, and the writer output
+        -- of the acquire has not been accumulated,
+        -- If there is a result, dont have to use the acquire writer result, its
+        -- already included in @w2@
+        tell $ maybe w1 snd my
+        release (fst <$> my) r
 
-            use' (r, w1) = runWriterT $ tell w1 >> use r
-        in WriterT $ do
-            ((z, w3), (y, w2)) <- svbracket (runWriterT acquire) release' use'
-            return ((z, y), w2 `mappend` w3)
+      use' (r, w1) = runWriterT $ tell w1 >> use r
+    in WriterT $ do
+      ((z, w3), (y, w2)) <- svbracket (runWriterT acquire) release' use'
+      return ((z, y), w2 `mappend` w3)
 
 -- Lifts a stateful value bracket into `EitherT e`, in cases where the release and use both
 -- result in value errors, precedence is given to the use error, the release error is dropped...
@@ -219,57 +219,57 @@ instance (Monoid w, MonadBracket m) => MonadBracket (WriterT w m) where
 -- way...
 --
 esvbracket
-    :: forall m e a b c. (Monad m)
-    => SVBracket m
-    -> SVBracket' (EitherT e m) a b c
+  :: forall m e a b c. (Monad m)
+  => SVBracket m
+  -> SVBracket' (EitherT e m) a b c
 esvbracket svbracket' acquire release use =
-    let
-        acquire' :: m (Either e a)
-        acquire' = runEitherT acquire
+  let
+    acquire' :: m (Either e a)
+    acquire' = runEitherT acquire
 
-        release' :: Maybe (Either e b) -> Either e a -> m (Either e c)
-        release' meb =
-            let
-                mb :: Maybe b
-                mb = meb >>= head
-            in either (pure . Left) (runEitherT . release mb) -- if acquire' failed pass through
+    release' :: Maybe (Either e b) -> Either e a -> m (Either e c)
+    release' meb =
+      let
+        mb :: Maybe b
+        mb = meb >>= head
+      in either (pure . Left) (runEitherT . release mb) -- if acquire' failed pass through
 
-        use' :: Either e a -> m (Either e b) -- if acquire' failed skip the use'
-        use' = either (pure . Left) (runEitherT . use)
-    in EitherT $ do
-        (releaseResult, result) <- svbracket' acquire' release' use'
-        return $ (,) <$> releaseResult <*> result
+    use' :: Either e a -> m (Either e b) -- if acquire' failed skip the use'
+    use' = either (pure . Left) (runEitherT . use)
+  in EitherT $ do
+    (releaseResult, result) <- svbracket' acquire' release' use'
+    return $ (,) <$> releaseResult <*> result
 
 stateTBracket
-    :: forall m s a b c. (Functor m)
-    => SVBracket m
-    -> SVBracket' (StateT s m) a b c
+  :: forall m s a b c. (Functor m)
+  => SVBracket m
+  -> SVBracket' (StateT s m) a b c
 stateTBracket svb acquire release use =
-        let
-            acquire' :: s -> m (a, s)
-            acquire' = runStateT acquire
+  let
+    acquire' :: s -> m (a, s)
+    acquire' = runStateT acquire
 
-            release' :: Maybe (b, s) -> (a, s) -> m (c, s)
-            release' mbs (resource, s) =
-                let
-                    -- if use ran successully use its state, otherwise use the state from the acquire (this is what happens in the `MonadCatch` instance for `StateT`)
-                    st :: s
-                    st = maybe s snd mbs
+    release' :: Maybe (b, s) -> (a, s) -> m (c, s)
+    release' mbs (resource, s) =
+      let
+          -- if use ran successully use its state, otherwise use the state from the acquire (this is what happens in the `MonadCatch` instance for `StateT`)
+          st :: s
+          st = maybe s snd mbs
 
-                    mb :: Maybe b
-                    mb = fst <$> mbs
-                in runStateT (release mb resource) st
+          mb :: Maybe b
+          mb = fst <$> mbs
+      in runStateT (release mb resource) st
 
-            use' :: (a, s) -> m (b, s)
-            use' (resource, st) = runStateT (use resource) st
+    use' :: (a, s) -> m (b, s)
+    use' (resource, st) = runStateT (use resource) st
 
-            -- This is for the case when everything succeeds,
-            -- release should have been run last, so take its state value...
-            --
-            selectFinalState :: ((c, s), (b, s)) -> ((c, b), s)
-            selectFinalState ((rel, s'), (result, _)) = ((rel, result), s')
+    -- This is for the case when everything succeeds,
+    -- release should have been run last, so take its state value...
+    --
+    selectFinalState :: ((c, s), (b, s)) -> ((c, b), s)
+    selectFinalState ((rel, s'), (result, _)) = ((rel, result), s')
 
-        in StateT $ \s -> selectFinalState <$> svb (acquire' s) release' use'
+  in StateT $ \s -> selectFinalState <$> svb (acquire' s) release' use'
 
 
 -- MonadBracket functions
@@ -291,44 +291,56 @@ vbracket acquire release use = svbracket acquire (const release) use
 -- get dropped.
 --
 ebracket
-    :: forall m e a b c. (MonadBracket m)
-    => EitherT e m a        -- ^ @acquire@
-    -> (a -> EitherT e m c) -- ^ @release@
-    -> (a -> EitherT e m b) -- ^ @use@
-    -> EitherT e m b
+  :: forall m e a b c. (MonadBracket m)
+  => EitherT e m a        -- ^ @acquire@
+  -> (a -> EitherT e m c) -- ^ @release@
+  -> (a -> EitherT e m b) -- ^ @use@
+  -> EitherT e m b
 ebracket acquire release use = snd <$> esvbracket svbracket acquire (const release) use
 
 evbracket
-    :: forall m e a b c. (MonadBracket m)
-    => EitherT e m a        -- ^ @acquire@
-    -> (a -> EitherT e m c) -- ^ @release@
-    -> (a -> EitherT e m b) -- ^ @use@
-    -> EitherT e m (c, b)
+  :: forall m e a b c. (MonadBracket m)
+  => EitherT e m a        -- ^ @acquire@
+  -> (a -> EitherT e m c) -- ^ @release@
+  -> (a -> EitherT e m b) -- ^ @use@
+  -> EitherT e m (c, b)
 evbracket acquire release use = esvbracket svbracket acquire (const release) use
 
 bracket' :: (MonadBracket m) => m a -> (a -> m c) -> (a -> m b) -> m b
 bracket' acquire release use = snd <$> vbracket acquire release use
 
 strictBracketEitherT
-    :: forall m e e' e'' a b c. (MonadBracket m)
-    => EitherT e m a            -- ^ acquire
-    -> (a -> EitherT e'' m c)   -- ^ release
-    -> (a -> EitherT e' m b)    -- ^ use
-    -> EitherT (StrictBracketError b e e' e'') m (c, b)
+  :: forall m e e' e'' a b c. (MonadBracket m)
+  => EitherT e m a            -- ^ acquire
+  -> (a -> EitherT e'' m c)   -- ^ release
+  -> (a -> EitherT e' m b)    -- ^ use
+  -> EitherT (StrictBracketError b e e' e'') m (c, b)
 strictBracketEitherT acquire release use =
-    let
-        release' :: a -> EitherT e m (Either e'' c)
-        release' = lift . runEitherT . release
+  let
+    release' :: a -> EitherT e m (Either e'' c)
+    release' = lift . runEitherT . release
 
-        use' :: a -> EitherT e m (Either e' b)
-        use' = lift . runEitherT . use
+    use' :: a -> EitherT e m (Either e' b)
+    use' = lift . runEitherT . use
 
-        resolveErrors :: Either e (Either e'' c, Either e' b) -> Either (StrictBracketError b e e' e'') (c, b)
-        resolveErrors (Left err)                        = Left $ AcquireFailed err
-        resolveErrors (Right (Left rel, Left inner))    = Left $ UseFailedAndResourceLeak inner rel
-        resolveErrors (Right (Left rel, Right inner))   = Left $ UseSucceededButResourceLeak inner rel
-        resolveErrors (Right (Right _, Left inner))     = Left $ UseFailed inner
-        resolveErrors (Right (Right rel, Right inner))  = Right (rel, inner)
-    in EitherT . fmap resolveErrors . runEitherT $ evbracket acquire release' use'
+    resolveErrors :: Either e (Either e'' c, Either e' b) -> Either (StrictBracketError b e e' e'') (c, b)
+    resolveErrors (Left err)                        = Left $ AcquireFailed err
+    resolveErrors (Right (Left rel, Left inner))    = Left $ UseFailedAndResourceLeak inner rel
+    resolveErrors (Right (Left rel, Right inner))   = Left $ UseSucceededButResourceLeak inner rel
+    resolveErrors (Right (Right _, Left inner))     = Left $ UseFailed inner
+    resolveErrors (Right (Right rel, Right inner))  = Right (rel, inner)
+  in EitherT . fmap resolveErrors . runEitherT $ evbracket acquire release' use'
 
-
+weakBracketEitherT
+  :: forall m e e' e'' a b c. (MonadBracket m)
+  => EitherT  e m a          -- ^ acquire
+  -> (a -> EitherT e'' m c)  -- ^ release
+  -> (a -> EitherT e' m b)   -- ^ use
+  -> EitherT (WeakBracketError e e' e'') m (WeakBracketResult e'' c b)
+weakBracketEitherT acquire release use = EitherT $
+ flip fmap (runEitherT (strictBracketEitherT acquire release use)) $ \case
+    Left (AcquireFailed e) -> Left $ WeakCouldNotAcquire e
+    Left (UseFailedAndResourceLeak useError releaseError) -> Left $ WeakUseFailedAndResourceLeak useError releaseError
+    Left (UseSucceededButResourceLeak x releaseError) -> pure $ ResourceLeak releaseError x
+    Left (UseFailed useError) -> Left $ WeakUseFailed useError
+    Right (x, y) -> pure $ AllOk x y

@@ -27,3 +27,6 @@ internal/
 
 # liquid artifacts
 .liquid/
+
+TAGS
+.projectile
