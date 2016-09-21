@@ -1,0 +1,52 @@
+name:               ultra-http-client
+version:            0.0.1
+license:            BSD3
+license-file:       etc/LICENCE.md
+author:             Dom De Re
+maintainer:         Dom De Re
+copyright:          Copyright (C) 2014-2016
+synopsis:           http-client wrappers to adapt their exception centric error handling over to my EitherT centric error handling
+category:           Network
+description:        http-client wrappers to adapt their exception centric error handling over to my EitherT centric error handling
+homepage:           https://github.com/domdere/ultra/issues
+bug-reports:        https://github.com/domdere/ultra/issues
+cabal-version:      >= 1.18
+build-type:         Simple
+
+source-repository       head
+    type:               git
+    location:           https://github.com/domdere/ultra.git
+
+flag                    small_base
+    description:        Choose the new, split-up base package.
+
+library
+    default-language:   Haskell2010
+
+    build-depends:      array
+                      , base < 5 && >= 4
+                      , bytestring        == 0.10.*
+                      , case-insensitive  == 1.2.*
+                      , containers
+                      , http-client       >= 0.4 && < 0.6
+                      , http-types        == 0.9.*
+                      , preamble
+                      , ultra-either
+                      , ultra-exceptions
+                      , ultra-text
+
+    ghc-options:        -Wall
+
+    hs-source-dirs:     src
+
+    exposed-modules:    Ultra.Network.HTTP.Client
+
+test-suite              test
+    default-language:   Haskell2010
+    type:               exitcode-stdio-1.0
+    main-is:            test.hs
+    hs-source-dirs:     test
+    build-depends:      base                >= 4 && < 5
+                    ,   lab-core
+                    ,   preamble
+                    ,   ultra-http-client
