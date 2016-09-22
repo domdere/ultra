@@ -38,6 +38,7 @@ library
 
     exposed-modules:    Ultra.Data.Text
                         Ultra.Data.Text.Encoding
+                        Ultra.Data.Text.Encoding.Error
                         Ultra.Data.Text.IO
 
     default-extensions: NoImplicitPrelude

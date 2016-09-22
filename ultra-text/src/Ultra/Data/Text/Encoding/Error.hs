@@ -7,6 +7,6 @@
 -- Maintainer   : Dom De Re
 --
 -------------------------------------------------------------------
-module Ultra.Data.Text.Encoding (module X) where
+module Ultra.Data.Text.Encoding.Error (module X) where
 
-import Data.Text.Encoding as X
+import Data.Text.Encoding.Error as X
