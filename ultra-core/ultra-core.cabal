@@ -39,6 +39,8 @@ library
                         Ultra.Data.Either
                         Ultra.Data.Foldable
                         Ultra.Data.List
+                        Ultra.Data.Ord
+                        Ultra.Data.RealFrac
 
     default-extensions: NoImplicitPrelude
 
