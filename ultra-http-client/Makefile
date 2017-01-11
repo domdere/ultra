@@ -30,7 +30,7 @@ build: ${DEPS}
 	cabal build -j --ghc-option="-Werror"
 
 test: ${DEPS}
-	cabal test quickcheck --log=/dev/stdout
+	cabal test --log=/dev/stdout
 
 hlint: ${DEPS}
 	cabal test hlint --log=/dev/stdout
