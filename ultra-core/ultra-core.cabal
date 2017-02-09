@@ -17,7 +17,7 @@ build-type:         Simple
 
 source-repository       head
     type:               git
-    location:           https://github.com/domdere/ultra/ultra-base
+    location:           https://github.com/domdere/ultra.git
 
 flag                    small_base
     description:        Choose the new, split-up base package.
@@ -39,7 +39,9 @@ library
                         Ultra.Data.Either
                         Ultra.Data.Foldable
                         Ultra.Data.List
+                        Ultra.Data.NonZero
                         Ultra.Data.Ord
+                        Ultra.Data.Ratio
                         Ultra.Data.RealFrac
 
     default-extensions: NoImplicitPrelude
