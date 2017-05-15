@@ -1,7 +1,7 @@
 name:               ultra-exceptions-lens
 version:            0.0.1
 license:            BSD3
-license-file:       ../etc/LICENCE.md
+license-file:       etc/LICENCE.md
 author:             Dom De Re
 maintainer:         Dom De Re
 copyright:          Copyright (C) 2014-2016
