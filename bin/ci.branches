@@ -7,7 +7,7 @@ git submodule update
 
 for x in ultra-*; do
     cd $x
-    make build
-    make test
+    ./mafia build
+    ./mafia test
     cd $ROOT_DIR
 done

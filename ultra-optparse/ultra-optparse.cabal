@@ -1,10 +1,10 @@
 name:               ultra-optparse
 version:            0.0.1
 license:            BSD3
-license-file:       ../etc/LICENCE.md
+license-file:       etc/LICENCE.md
 author:             Dom De Re
 maintainer:         Dom De Re
-copyright:          Copyright (C) 2015
+copyright:          Copyright (C) 2015-2017
 synopsis:           `optparse-applicative`, but `ultra`
 category:           Data
 description:        `optparse-applicative` done `ultra`
