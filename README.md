@@ -1,4 +1,4 @@
-# ultra
+# ultra [![Build Status](https://img.shields.io/travis/domdere/ultra.svg?style=flat)](https://travis-ci.org/domdere/ultra)
 
 TODO: Insert a Picture here of the "Street Fighter IV: Ultra" banner sometime.
 
