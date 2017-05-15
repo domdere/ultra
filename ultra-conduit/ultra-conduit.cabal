@@ -1,10 +1,10 @@
 name:               ultra-conduit
 version:            0.0.1
 license:            BSD3
-license-file:       ../etc/LICENCE.md
+license-file:       etc/LICENCE.md
 author:             Dom De Re
 maintainer:         Dom De Re
-copyright:          Copyright (C) 2014-2016
+copyright:          Copyright (C) 2014-2017
 synopsis:           `conduit` done `ultra`, in practice this mostly is just about pulling out those damn exceptions and injecting them into `EitherT`.  "Best Practices" my ass FPComplete
 category:           Data
 description:        `conduit` done `ultra`, in practice this mostly is just about pulling out those damn exceptions and injecting them into `EitherT`.  "Best Practices" my ass FPComplete
