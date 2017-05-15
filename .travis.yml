@@ -1,0 +1,45 @@
+language: generic
+
+sudo: false
+
+git:
+  submodules: false
+
+cache:
+  directories:
+    - $HOME/.mafia
+
+matrix:
+  include:
+  - env: GHCVER=7.10.2 CABALVER=1.24
+    addons:
+      apt:
+        sources:
+          - hvr-ghc
+        packages:
+          - ghc-7.10.2
+          - cabal-install-1.24
+  #- env: GHCVER=head CABALVER=1.24
+  #  addons:
+  #    apt:
+  #      sources:
+  #        - hvr-ghc
+  #      packages:
+  #        - ghc-head
+  #        - cabal-install-1.24
+  #allow-failures:
+  #  - env: GHCVER=head
+addons:
+  apt:
+    sources:
+      - hvr-ghc
+    packages:
+      - ghc-7.10.2
+      - libgmp-dev
+
+before_install:
+  # ghc
+  - export PATH=/opt/ghc/$GHCVER/bin:/opt/cabal/$CABALVER/bin:$PATH
+
+script:
+  - bin/ci
