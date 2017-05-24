@@ -1,3 +1,4 @@
+{-# LANGUAGE NoImplicitPrelude #-}
 -------------------------------------------------------------------
 -- |
 -- Module       : Ultra.Data.List.Lens
