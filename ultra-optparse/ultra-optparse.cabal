@@ -28,7 +28,7 @@ library
     build-depends:      base < 5 && >= 4
                     ,   containers
                     ,   array
-                    ,   preamble
+                    ,   domdere-preamble
                     ,   optparse-applicative            == 0.12.*
                     ,   ultra-cli
                     ,   ultra-text
@@ -45,6 +45,6 @@ test-suite              quickcheck
     main-is:            Main.hs
     hs-source-dirs:     test
     build-depends:      base                >= 4 && < 5
+                    ,   domdere-preamble
                     ,   lab-core
-                    ,   preamble
                     ,   ultra-optparse
