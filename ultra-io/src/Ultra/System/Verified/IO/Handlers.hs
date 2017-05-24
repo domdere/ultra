@@ -1,3 +1,4 @@
+{-# LANGUAGE NoImplicitPrelude #-}
 -------------------------------------------------------------------
 -- |
 -- Module       : Ultra.System.Verified.IO.Handlers
