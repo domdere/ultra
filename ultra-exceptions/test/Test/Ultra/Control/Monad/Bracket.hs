@@ -1,5 +1,7 @@
+{-# LANGUAGE NoImplicitPrelude #-}
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE RankNTypes #-}
+{-# LANGUAGE TemplateHaskell #-}
 -------------------------------------------------------------------
 -- |
 -- Module       : Test.Ultra.Control.Monad.Bracket
