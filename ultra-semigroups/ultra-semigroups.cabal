@@ -28,7 +28,7 @@ library
     build-depends:      base < 5 && >= 4
                     ,   containers
                     ,   array
-                    ,   preamble
+                    ,   domdere-preamble
                     ,   semigroups                  == 0.18.*
 
     ghc-options:        -Wall
@@ -37,17 +37,12 @@ library
 
     exposed-modules:    Ultra.Data.List.NonEmpty
 
-    default-extensions: NoImplicitPrelude
-
 test-suite              quickcheck
     default-language:   Haskell2010
     type:               exitcode-stdio-1.0
     main-is:            Main.hs
     hs-source-dirs:     quickcheck
     build-depends:      base                >= 4 && < 5
-                    ,   preamble
+                    ,   domdere-preamble
                     ,   QuickCheck          == 2.8.*
                     ,   ultra-semigroups
-
-    default-extensions: NoImplicitPrelude
-                        TemplateHaskell

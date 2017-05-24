@@ -1,3 +1,5 @@
+{-# LANGUAGE NoImplicitPrelude #-}
+{-# LANGUAGE TemplateHaskell #-}
 -------------------------------------------------------------------
 -- |
 -- Module       : Test.Ultra.Data.List.NonEmpty
