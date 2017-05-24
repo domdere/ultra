@@ -4,7 +4,7 @@ license:            BSD3
 license-file:       etc/LICENCE.md
 author:             Dom De Re
 maintainer:         Dom De Re
-copyright:          Copyright (C) 2014-2016
+copyright:          Copyright (C) 2014-2017
 synopsis:           CLI related functions
 category:           System
 description:        CLI related functions
@@ -29,7 +29,7 @@ library
                     ,   containers
                     ,   array
                     ,   bytestring              == 0.10.*
-                    ,   preamble
+                    ,   domdere-preamble
                     ,   ultra-either
                     ,   ultra-text
 

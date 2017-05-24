@@ -30,7 +30,7 @@ library
                     ,   array
                     ,   conduit         == 1.2.*
                     ,   conduit-extra   == 1.1.*
-                    ,   preamble
+                    ,   domdere-preamble
                     ,   ultra-either
                     ,   ultra-text
 
@@ -54,6 +54,6 @@ test-suite              quickcheck
     main-is:            Main.hs
     hs-source-dirs:     test
     build-depends:      base                >= 4 && < 5
+                    ,   domdere-preamble
                     ,   lab-core
-                    ,   preamble
                     ,   ultra-conduit

@@ -4,11 +4,11 @@ license:            BSD3
 license-file:       etc/LICENCE.md
 author:             Dom De Re
 maintainer:         Dom De Re
-copyright:          Copyright (C) 2014-2016
+copyright:          Copyright (C) 2014-2017
 synopsis:           http-client wrappers to adapt their exception centric error handling over to my EitherT centric error handling
 category:           Network
 description:        http-client wrappers to adapt their exception centric error handling over to my EitherT centric error handling
-homepage:           https://github.com/domdere/ultra/issues
+homepage:           https://github.com/domdere/ultra
 bug-reports:        https://github.com/domdere/ultra/issues
 cabal-version:      >= 1.18
 build-type:         Simple
@@ -28,9 +28,9 @@ library
                       , bytestring        == 0.10.*
                       , case-insensitive  == 1.2.*
                       , containers
+                      , domdere-preamble
                       , http-client       >= 0.4 && < 0.6
                       , http-types        == 0.9.*
-                      , preamble
                       , ultra-either
                       , ultra-exceptions
                       , ultra-text
@@ -47,6 +47,6 @@ test-suite              test
     main-is:            test.hs
     hs-source-dirs:     test
     build-depends:      base                >= 4 && < 5
+                    ,   domdere-preamble
                     ,   lab-core
-                    ,   preamble
                     ,   ultra-http-client

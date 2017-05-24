@@ -4,7 +4,7 @@ license:            BSD3
 license-file:       etc/LICENCE.md
 author:             Dom De Re
 maintainer:         Dom De Re
-copyright:          Copyright (C) 2014-2016
+copyright:          Copyright (C) 2014-2017
 synopsis:           Ultra IO, with EitherT the way it was supposed to be
 category:           Data
 description:        Ultra IO, with EitherT the way it was supposed to be
@@ -29,7 +29,7 @@ library
                     ,   containers
                     ,   array
                     ,   directory               >= 1.2.5.0 && <= 1.3
-                    ,   preamble
+                    ,   domdere-preamble
                     ,   ultra-either
                     ,   ultra-exceptions
                     ,   ultra-text
@@ -45,17 +45,12 @@ library
                         Ultra.System.Verified.IO.Error
                         Ultra.System.Verified.IO.Handlers
 
-    default-extensions: NoImplicitPrelude
-
 test-suite              quickcheck
     default-language:   Haskell2010
     type:               exitcode-stdio-1.0
     main-is:            Main.hs
     hs-source-dirs:     test
     build-depends:      base                >= 4 && < 5
+                    ,   domdere-preamble
                     ,   lab-core
-                    ,   preamble
                     ,   ultra-io
-
-    default-extensions: NoImplicitPrelude
-                        TemplateHaskell
