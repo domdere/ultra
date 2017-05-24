@@ -4,11 +4,11 @@ license:            BSD3
 license-file:       etc/LICENCE.md
 author:             Dom De Re
 maintainer:         Dom De Re
-copyright:          Copyright (C) 2014-2016
+copyright:          Copyright (C) 2014-2017
 synopsis:           Ultra base
 category:           Data
 description:        Ultra Base
-homepage:           https://github.com/domdere/ultra/issues
+homepage:           https://github.com/domdere/ultra
 bug-reports:        https://github.com/domdere/ultra/issues
 cabal-version:      >= 1.18
 build-type:         Simple
@@ -28,7 +28,7 @@ library
     build-depends:      base < 5 && >= 4
                     ,   containers
                     ,   array
-                    ,   preamble
+                    ,   domdere-preamble
 
     ghc-options:        -Wall
 
@@ -52,8 +52,8 @@ test-suite              quickcheck
     main-is:            Main.hs
     hs-source-dirs:     quickcheck
     build-depends:      base                >= 4 && < 5
+                    ,   domdere-preamble
                     ,   lab-core
-                    ,   preamble
                     ,   QuickCheck          == 2.8.*
                     ,   ultra-either
                     ,   ultra-core
