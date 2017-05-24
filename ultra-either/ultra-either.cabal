@@ -4,11 +4,11 @@ license:            BSD3
 license-file:       etc/LICENCE.md
 author:             Dom De Re
 maintainer:         Dom De Re
-copyright:          Copyright (C) 2014-2016
+copyright:          Copyright (C) 2014-2017
 synopsis:           Either, but more Ultra
 category:           Data
 description:        Either, but more Ultra
-homepage:           https://github.com/domdere/ultra/issues
+homepage:           https://github.com/domdere/ultra
 bug-reports:        https://github.com/domdere/ultra/issues
 cabal-version:      >= 1.18
 build-type:         Simple
@@ -28,8 +28,8 @@ library
     build-depends:      base < 5 && >= 4
                     ,   containers
                     ,   array
+                    ,   domdere-preamble
                     ,   exceptions      == 0.8.*
-                    ,   preamble
 
     ghc-options:        -Wall
 
@@ -43,8 +43,8 @@ test-suite              quickcheck
     main-is:            Main.hs
     hs-source-dirs:     test
     build-depends:      base                >= 4 && < 5
+                    ,   domdere-preamble
                     ,   lab-core
-                    ,   preamble
                     ,   ultra-either
 
     default-extensions: NoImplicitPrelude

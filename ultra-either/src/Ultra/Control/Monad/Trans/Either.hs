@@ -29,6 +29,9 @@ import Preamble
 
 type EitherT = ExceptT
 
+pattern EitherT
+  :: m (Either a b)
+  -> ExceptT a m b
 pattern EitherT m = ExceptT m
 
 runEitherT :: EitherT e m a -> m (Either e a)
