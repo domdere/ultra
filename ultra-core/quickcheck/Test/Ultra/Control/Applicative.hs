@@ -1,3 +1,4 @@
+{-# LANGUAGE ScopedTypeVariables #-}
 -------------------------------------------------------------------
 -- |
 -- Module       : Test.Ultra.Control.Applicative
@@ -37,6 +38,12 @@ prop_guarded_true = (===) <$> guarded True <*> Just
 
 prop_guarded_false :: (Arbitrary a, Show a, Eq a) => a -> Property
 prop_guarded_false x = guarded False x === Nothing
+
+prop_guardPred_like_guard_true :: forall a. (Arbitrary a, Show a, Eq a) => a -> Property
+prop_guardPred_like_guard_true x = guardPred (const True) x === (guarded True x :: Maybe a)
+
+prop_guardPred_like_guard_false :: forall a. (Arbitrary a, Show a, Eq a) => a -> Property
+prop_guardPred_like_guard_false x = guardPred (const False) x === (guarded False x :: Maybe a)
 
 prop_guardMaybe :: (Arbitrary a, Show a, Eq a) => [a] -> Maybe a -> Property
 prop_guardMaybe xs = (===) <$> guardMaybe xs <*> maybe xs pure
