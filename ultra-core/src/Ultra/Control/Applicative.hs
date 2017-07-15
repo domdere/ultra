@@ -7,13 +7,14 @@
 --
 -------------------------------------------------------------------
 module Ultra.Control.Applicative (
-    -- * Functions
-        many1
-    ,   checkPredicate
-    ,   guarded
-    ,   guardMaybe
-    ,   liftMaybe
-    ) where
+  -- * Functions
+    many1
+  , checkPredicate
+  , guarded
+  , guardPred
+  , guardMaybe
+  , liftMaybe
+  ) where
 
 import Preamble
 
@@ -35,6 +36,13 @@ checkPredicate = (>>= guarded)
 
 guarded :: (Alternative f) => Bool -> a -> f a
 guarded p x = if p then pure x else empty
+
+-- |
+-- For translating conventional boolean based preds
+-- to the @Maybe a@ kind that i use
+--
+guardPred :: (Alternative f) => (a -> Bool) -> a -> f a
+guardPred = (>>= guarded)
 
 -- |
 -- Common use case for this is translating a `Preamble.Maybe` value into
