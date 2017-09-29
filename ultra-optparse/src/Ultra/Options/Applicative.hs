@@ -34,7 +34,7 @@ import Options.Applicative.Builder.Internal (HasValue)
 
 import System.Environment (getArgs)
 
-import Preamble hiding ((<>))
+import Preamble
 
 command' :: T.Text -> T.Text -> Parser a -> Mod CommandFields a
 command' name description parser = command (T.unpack name) (info (parser <**> helper) (progDesc . T.unpack $ description))

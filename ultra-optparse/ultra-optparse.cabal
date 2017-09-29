@@ -29,7 +29,7 @@ library
                     ,   containers
                     ,   array
                     ,   domdere-preamble
-                    ,   optparse-applicative            == 0.12.*
+                    ,   optparse-applicative            == 0.14.*
                     ,   ultra-cli
                     ,   ultra-text
 
