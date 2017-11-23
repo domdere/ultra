@@ -4,33 +4,44 @@
 -------------------------------------------------------------------
 -- |
 -- Module       : Ultra.Options.Applicative
--- Copyright    : (C) 2015
+-- Copyright    : (C) 2015 - 2018
 -- License      : BSD-style (see the file etc/LICENSE.md)
 -- Maintainer   : Dom De Re
 --
 -------------------------------------------------------------------
 module Ultra.Options.Applicative (
-        module X
-    -- * Functions
-    ,   command'
-    ,   commandParser
-    ,   parseAndRun
-    ,   dryrun
-    ,   eitherTextReader
-    ,   envvar
-    ,   envvarWithDefault
-    ,   envvarWithDefaultWithRender
-    ,   shimTextParser
-    ,   bverbosity
-    ,   verbosity
-    ) where
+  -- * Re-exports
+    module X
+  -- ** Type Classes
+  , HasCompleter
+  , HasMetavar
+  , HasName
+  , HasValue
+  -- * Functions
+  , command'
+  , commandParser
+  , parseAndRun
+  , dryrun
+  , eitherTextReader
+  , envvar
+  , envvarWithDefault
+  , envvarWithDefaultWithRender
+  , shimTextParser
+  , bverbosity
+  , verbosity
+  ) where
 
 import Ultra.Cli.Data (BinaryVerbosity(..), Verbosity(..), DryRun(..))
 import qualified Ultra.Data.Text as T
 
 import qualified Data.List as L
 import Options.Applicative as X
-import Options.Applicative.Builder.Internal (HasValue)
+import Options.Applicative.Builder.Internal (
+    HasCompleter
+  , HasMetavar
+  , HasName
+  , HasValue
+  )
 
 import System.Environment (getArgs)
 
@@ -41,28 +52,28 @@ command' name description parser = command (T.unpack name) (info (parser <**> he
 
 commandParser :: a -> [Mod CommandFields a] -> Parser a
 commandParser versionCommand cs =
-        flag' versionCommand (short 'v' <> long "version" <> help "version info.")
-    <|> (subparser $ foldr (<>) mempty cs)
+      flag' versionCommand (short 'v' <> long "version" <> help "version info.")
+  <|> (subparser $ foldr (<>) mempty cs)
 
 parseAndRun
-    :: T.Text
-    -> T.Text
-    -> Parser a
-    -> (a -> IO b)
-    -> IO b
+  :: T.Text
+  -> T.Text
+  -> Parser a
+  -> (a -> IO b)
+  -> IO b
 parseAndRun h desc p f =
-    let
-        topMods :: InfoMod a
-        topMods = fullDesc
-            <>  progDesc (T.unpack desc)
-            <>  header (T.unpack h)
-    in do
-        x <- getArgs
-        case x of
-            -- If there were no commands, and the flags (the only valids ones in this case should be --version/-v and --help)
-            -- are not recognised, then show the help msg.
-            []  -> customExecParser (prefs showHelpOnError) (info (p <**> helper) topMods) >>= f
-            _   -> execParser (info (p <**> helper) topMods) >>= f
+  let
+    topMods :: InfoMod a
+    topMods = fullDesc
+      <>  progDesc (T.unpack desc)
+      <>  header (T.unpack h)
+  in do
+    x <- getArgs
+    case x of
+      -- If there were no commands, and the flags (the only valids ones in this case should be --version/-v and --help)
+      -- are not recognised, then show the help msg.
+      []  -> customExecParser (prefs showHelpOnError) (info (p <**> helper) topMods) >>= f
+      _   -> execParser (info (p <**> helper) topMods) >>= f
 
 
 shimTextParser :: (T.Text -> Either T.Text a) -> String -> Either String a
@@ -77,66 +88,66 @@ eitherTextReader = X.eitherReader . shimTextParser
 -- cannot be parsed, it doesnt really give a nice error...
 --
 envvar
-    :: (HasValue f)
-    => (T.Text -> Maybe a)
-    -> [(T.Text, T.Text)]
-    -> T.Text
-    -> T.Text
-    -> X.Mod f a
+  :: (HasValue f)
+  => (T.Text -> Maybe a)
+  -> [(T.Text, T.Text)]
+  -> T.Text
+  -> T.Text
+  -> X.Mod f a
 envvar = envvar' mempty
 
 envvarWithDefault
-    :: (HasValue f, Show a)
-    => (T.Text -> Maybe a)
-    -> [(T.Text, T.Text)]
-    -> T.Text
-    -> a
-    -> T.Text
-    -> X.Mod f a
+  :: (HasValue f, Show a)
+  => (T.Text -> Maybe a)
+  -> [(T.Text, T.Text)]
+  -> T.Text
+  -> a
+  -> T.Text
+  -> X.Mod f a
 envvarWithDefault f envs env def h = envvar' (value def <> showDefault) f envs env h
 
 envvarWithDefaultWithRender
-    :: (HasValue f)
-    => (T.Text -> Maybe a)
-    -> (a -> T.Text)
-    -> [(T.Text, T.Text)]
-    -> T.Text
-    -> a
-    -> T.Text
-    -> X.Mod f a
+  :: (HasValue f)
+  => (T.Text -> Maybe a)
+  -> (a -> T.Text)
+  -> [(T.Text, T.Text)]
+  -> T.Text
+  -> a
+  -> T.Text
+  -> X.Mod f a
 envvarWithDefaultWithRender f render envs env def h = envvar' (value def <> showDefaultWith (T.unpack . render)) f envs env h
 
 envvar'
-    :: (HasValue f)
-    => X.Mod f a
-    -> (T.Text -> Maybe a)
-    -> [(T.Text, T.Text)]
-    -> T.Text
-    -> T.Text
-    -> X.Mod f a
+  :: (HasValue f)
+  => X.Mod f a
+  -> (T.Text -> Maybe a)
+  -> [(T.Text, T.Text)]
+  -> T.Text
+  -> T.Text
+  -> X.Mod f a
 envvar' ifEmpty f envs env h =
-    let
-        o = maybe ifEmpty value (L.lookup env envs >>= f)
-    in mappend o . help . T.unpack . T.concat $ [
-            h
-        ,   " (can be set via environment variable "
-        ,   env
-        ,   ")"
-        ]
+  let
+    o = maybe ifEmpty value (L.lookup env envs >>= f)
+  in mappend o . help . T.unpack . T.concat $ [
+      h
+    , " (can be set via environment variable "
+    , env
+    , ")"
+    ]
 
 bverbosity :: Parser BinaryVerbosity
 bverbosity = flag BQuiet BVerbose $
-        long "verbose"
-    <>  help "run verbosely"
+      long "verbose"
+  <>  help "run verbosely"
 
 verbosity :: Parser Verbosity
 verbosity = option (Verbose <$> auto) $
-        long "verbosity"
-    <>  value Quiet
-    <>  metavar "INT"
-    <>  help "run verbosely"
+      long "verbosity"
+  <>  value Quiet
+  <>  metavar "INT"
+  <>  help "run verbosely"
 
 dryrun :: Parser DryRun
 dryrun = flag RealDeal DryRun $
-        long "dry-run"
-    <>  help "if set, suppresses any I/O that would make any persistent changes"
+      long "dry-run"
+  <>  help "if set, suppresses any I/O that would make any persistent changes"
