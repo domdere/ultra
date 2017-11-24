@@ -23,6 +23,7 @@ module Ultra.Options.Applicative (
   , parseAndRun
   , dryrun
   , eitherTextReader
+  , enumWithDefaultP
   , envvar
   , envvarWithDefault
   , envvarWithDefaultWithRender
@@ -75,6 +76,18 @@ parseAndRun h desc p f =
       []  -> customExecParser (prefs showHelpOnError) (info (p <**> helper) topMods) >>= f
       _   -> execParser (info (p <**> helper) topMods) >>= f
 
+
+enumWithDefaultP :: forall a. (Eq a) => a -> NonEmpty (a, T.Text, T.Text) -> Parser a
+enumWithDefaultP def =
+  let
+    p :: a -> T.Text -> T.Text -> Parser a
+    p fp long' help' = flag' fp $
+          long (T.unpack long')
+      <>  help (T.unpack help')
+    f :: (a, T.Text, T.Text) -> Parser a -> Parser a
+    f (x, long', help') parser =
+      p x long' (help' <> (if x == def then " (Default)" else "")) <|> parser
+  in foldr f (pure def)
 
 shimTextParser :: (T.Text -> Either T.Text a) -> String -> Either String a
 shimTextParser f = first T.unpack . f . T.pack
