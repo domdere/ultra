@@ -1,5 +1,6 @@
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE RankNTypes #-}
+{-# LANGUAGE ScopedTypeVariables #-}
 -------------------------------------------------------------------
 -- |
 -- Module       : Ultra.System.Verified.IO
@@ -66,7 +67,7 @@ module Ultra.System.Verified.IO (
 
 import Ultra.Control.Monad.Bracket (MonadBracket(..), bracket', strictBracketEitherT)
 import Ultra.Control.Monad.Catch (MonadCatch(..), MonadThrow(..))
-import Ultra.Control.Monad.Trans.Either (EitherT, bimapEitherT, left)
+import Ultra.Control.Monad.Trans.Either (EitherT, bimapEitherT, left, runEitherT)
 import Ultra.System.IO
 import Ultra.System.Verified.IO.Error as X
 import Ultra.System.Verified.IO.Handlers
@@ -75,6 +76,7 @@ import qualified Ultra.Data.Text as T
 
 import qualified System.Directory as D
 import qualified System.IO as S
+import qualified System.Posix.Process as P
 
 import Preamble
 
@@ -273,16 +275,25 @@ removeVerifiedDirectoryRecursive v =
         pure . UnusedPath $ p
 
 withTempDir
-    :: (MonadBracket m, MonadCatch m, MonadIO m)
+    :: forall m e a. (MonadBracket m, MonadCatch m, MonadIO m)
     => VerifiedDirPath
-    -> T.Text
+    -> T.Text -- ^ The PID will be appended to this, if the resulting dir already exists, the PID will be incremented until a non-existing dir is found.
     -> (VerifiedDirPath -> EitherT e m a)
     -> EitherT (WithTempDirError e a) m a
-withTempDir parent dirName f =
+withTempDir parent dirPrefix f =
     let
         p :: T.Text
         p = verifiedDirPath parent
+
+        findDirName :: Int32 -> m UnusedPath
+        findDirName pid =
+          (runEitherT $ doesNotExist (T.concat [p, "/", dirPrefix, T.pack . show $ pid]) pure) >>=
+            either (const $ findDirName (pid + 1)) pure
     in bimapEitherT WithTempDirError snd $ strictBracketEitherT
-        (createDirectory $ T.concat [p, "/", dirName])
+        (do
+          pid <- liftIO P.getProcessID
+          dirName <- lift . findDirName . fromIntegral $ pid
+          createDirectory . unusedPath $ dirName
+        )
         removeVerifiedDirectoryRecursive
         f
