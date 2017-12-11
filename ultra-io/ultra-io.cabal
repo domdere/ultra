@@ -33,6 +33,7 @@ library
                     ,   ultra-either
                     ,   ultra-exceptions
                     ,   ultra-text
+                    ,   unix                    == 2.7.*
 
     ghc-options:        -Wall
 
