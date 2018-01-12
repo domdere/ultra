@@ -9,4 +9,4 @@
 -------------------------------------------------------------------
 module Ultra.Data.Aeson.Encode (module X) where
 
-import Data.Aeson.Encode as X
+import Data.Aeson.Text as X
