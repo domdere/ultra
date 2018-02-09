@@ -9,6 +9,7 @@ module Ultra.Network.HTTP.Client (
   -- * Functions
   , addRequestHeader
   , httpClientResponse
+  , optionalHttpClientResponse
   , catchHttpClientError
   , tryParsingBody
   , checkResponseStatus
@@ -57,6 +58,16 @@ httpClientResponse resp = case responseStatus resp of
     -- if we get a 3XX response, its because it broke the max redirects,
     -- in which case things are probably not OK
     if (statusCode' < 300 && statusCode' >= 200) then HttpOk resp else HttpNotOk resp
+
+optionalHttpClientResponse :: Response a -> Maybe (HttpClientResponse a)
+optionalHttpClientResponse resp = case responseStatus resp of
+  -- http-client SHOULD be handling redirects,
+  -- hence im not routing them through to HttpOk,
+  -- if we get a 3XX response, its because it broke the max redirects,
+  -- in which case things are probably not OK
+  Status statusCode' _ | statusCode' == 404                       -> Nothing
+  Status statusCode' _ | statusCode' < 300 && statusCode' >= 200  -> pure $ HttpOk resp
+  _                    | otherwise                                -> pure $ HttpNotOk resp
 
 addRequestHeader :: T.Text -> BS.ByteString -> Request -> Request
 addRequestHeader name value req = req {
