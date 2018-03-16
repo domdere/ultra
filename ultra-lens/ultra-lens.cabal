@@ -29,7 +29,7 @@ library
                     ,   containers
                     ,   array
                     ,   domdere-preamble
-                    ,   lens            == 4.15.*
+                    ,   lens            == 4.16.*
                     ,   profunctors
                     ,   ultra-either
 
