@@ -59,7 +59,7 @@ prop_jsonTextEnum_success =
       listSize <- fromIntegral <$> choose (0, 39 :: Int)
       ts <- distinctListOfN1 listSize (textOf1 alphaNumChars)
       ts' <- forM ts $ \x -> (,) x <$> arbitrary
-      (testTag, expectedResult) <- elements . toList $ ts'
+      (testTag, expectedResult) <- elements ts'
       pure (ts', testTag, expectedResult)
   in forAll tags $ \(tags', tagToCheck, expected) ->
     parseEither (jsonTextEnum tags') (toJSON tagToCheck) === pure expected
