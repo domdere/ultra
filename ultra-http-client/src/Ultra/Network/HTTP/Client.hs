@@ -1,4 +1,5 @@
 {-# LANGUAGE NoImplicitPrelude #-}
+{-# LANGUAGE ScopedTypeVariables #-}
 module Ultra.Network.HTTP.Client (
   -- * re-exports
     module X
@@ -8,6 +9,8 @@ module Ultra.Network.HTTP.Client (
   , JSONBodyParseError(..)
   -- * Functions
   , addRequestHeader
+  , dropStatus
+  , drop404
   , httpClientResponse
   , optionalHttpClientResponse
   , catchHttpClientError
@@ -16,11 +19,12 @@ module Ultra.Network.HTTP.Client (
   , jsonError
   ) where
 
-import Ultra.Control.Monad.Catch (MonadCatch(..))
+import Ultra.Control.Monad.Catch (MonadCatch(..), throwM)
 import Ultra.Control.Monad.Trans.Either (EitherT, hoistEither, left)
 import qualified Ultra.Data.Text as T
 import qualified Ultra.Data.Text.Encoding as T
 
+import Control.Exception.Base (Exception(..))
 import qualified Data.ByteString as BS
 import Data.CaseInsensitive (mk)
 
@@ -68,6 +72,29 @@ optionalHttpClientResponse resp = case responseStatus resp of
   Status statusCode' _ | statusCode' == 404                       -> Nothing
   Status statusCode' _ | statusCode' < 300 && statusCode' >= 200  -> pure $ HttpOk resp
   _                    | otherwise                                -> pure $ HttpNotOk resp
+
+-- | For use adapting "exception" style code
+--
+dropStatus
+  :: forall m a e. (Exception e, Applicative m, Monad m, MonadCatch m)
+  => Status
+  -> (e -> Maybe Status)
+  -> m a
+  -> m (Maybe a)
+dropStatus s getStatus mx =
+    let
+        handler :: e -> m (Maybe a)
+        handler e
+            | getStatus e == pure s = pure Nothing
+            | otherwise             = throwM e
+    in (Just <$> mx) `catch` handler
+
+drop404
+  :: forall m a e. (Exception e, Applicative m, Monad m, MonadCatch m)
+  => (e -> Maybe Status)
+  -> m a
+  -> m (Maybe a)
+drop404 = dropStatus status404
 
 addRequestHeader :: T.Text -> BS.ByteString -> Request -> Request
 addRequestHeader name value req = req {
