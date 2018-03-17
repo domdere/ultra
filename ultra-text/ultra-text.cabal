@@ -55,4 +55,6 @@ test-suite              quickcheck
                     ,   quickcheck-instances    == 0.3.*
                     ,   ultra-text
 
+    other-modules:      Test.Ultra.Data.Text
+
     default-extensions: NoImplicitPrelude
