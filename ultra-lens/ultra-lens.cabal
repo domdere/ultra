@@ -49,6 +49,6 @@ test-suite              quickcheck
                     ,   domdere-preamble
                     ,   lab-core
                     ,   lab-lens
-                    ,   QuickCheck          == 2.8.*
+                    --,   QuickCheck          == 2.10.*
                     ,   ultra-either
                     ,   ultra-lens
