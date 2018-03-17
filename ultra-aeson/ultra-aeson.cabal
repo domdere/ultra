@@ -51,3 +51,5 @@ test-suite              quickcheck
                     ,   quickcheck-instances    == 0.3.*
                     ,   ultra-text
                     ,   ultra-aeson
+
+    other-modules:      Test.Ultra.Data.Aeson
