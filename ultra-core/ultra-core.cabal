@@ -58,6 +58,14 @@ test-suite              quickcheck
                     ,   ultra-either
                     ,   ultra-core
 
+    other-modules:      Test.Ultra.Control.Applicative
+                        Test.Ultra.Data.Either
+                        Test.Ultra.Data.Foldable
+                        Test.Ultra.Data.NonZero
+                        Test.Ultra.Data.Ord
+                        Test.Ultra.Data.Ratio
+                        Test.Ultra.Data.RealFrac
+
 
     default-extensions: NoImplicitPrelude
                         TemplateHaskell
