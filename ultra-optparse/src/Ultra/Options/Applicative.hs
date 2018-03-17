@@ -12,11 +12,6 @@
 module Ultra.Options.Applicative (
   -- * Re-exports
     module X
-  -- ** Type Classes
-  , HasCompleter
-  , HasMetavar
-  , HasName
-  , HasValue
   -- * Functions
   , command'
   , commandParser
@@ -37,12 +32,6 @@ import qualified Ultra.Data.Text as T
 
 import qualified Data.List as L
 import Options.Applicative as X
-import Options.Applicative.Builder.Internal (
-    HasCompleter
-  , HasMetavar
-  , HasName
-  , HasValue
-  )
 
 import System.Environment (getArgs)
 
