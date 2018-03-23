@@ -53,3 +53,5 @@ test-suite              quickcheck
                     ,   lab-core
                     ,   ultra-either
                     ,   ultra-exceptions
+
+    other-modules:      Test.Ultra.Control.Monad.Bracket

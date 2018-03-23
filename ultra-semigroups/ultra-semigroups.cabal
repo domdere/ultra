@@ -46,3 +46,5 @@ test-suite              quickcheck
                     ,   domdere-preamble
                     ,   QuickCheck          == 2.8.*
                     ,   ultra-semigroups
+
+    other-modules:      Test.Ultra.Data.List.NonEmpty

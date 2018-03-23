@@ -48,3 +48,5 @@ test-suite              quickcheck
                     ,   lab-core
                     ,   lab-lens
                     ,   ultra-semigroups-lens
+
+    other-modules:      Test.Ultra.Data.List.NonEmpty.Lens

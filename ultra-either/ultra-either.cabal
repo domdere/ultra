@@ -47,5 +47,7 @@ test-suite              quickcheck
                     ,   lab-core
                     ,   ultra-either
 
+    other-modules:      Test.Ultra.Control.Monad.Trans.Either
+
     default-extensions: NoImplicitPrelude
                         TemplateHaskell

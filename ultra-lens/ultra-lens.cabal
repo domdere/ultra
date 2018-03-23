@@ -52,3 +52,6 @@ test-suite              quickcheck
                     --,   QuickCheck          == 2.10.*
                     ,   ultra-either
                     ,   ultra-lens
+
+    other-modules:      Test.Ultra.Control.Lens
+                        Test.Ultra.Data.List.Lens
