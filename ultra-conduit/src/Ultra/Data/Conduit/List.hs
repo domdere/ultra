@@ -26,10 +26,10 @@ import Preamble
 foldWithPrevious
     :: forall m i t. (Monad m)
     => (i -> Maybe t -> m t)
-    -> C.Conduit i m (i, t)
+    -> C.ConduitT i (i, t) m ()
 foldWithPrevious f =
     let
-        doStuff :: (Monad m) => (i -> Maybe t -> m t) -> Maybe t -> C.Conduit i m (i, t)
+        doStuff :: (Monad m) => (i -> Maybe t -> m t) -> Maybe t -> C.ConduitT i (i, t) m ()
         doStuff f' my = do
             mx <- C.await
             forM_ mx $ \x -> do
