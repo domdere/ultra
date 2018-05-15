@@ -1,13 +1,13 @@
-name:               ultra-conduit
+name:               ultra-conduit-legacy
 version:            0.0.1
 license:            BSD3
 license-file:       etc/LICENCE.md
 author:             Dom De Re
 maintainer:         Dom De Re
-copyright:          Copyright (C) 2014-2017
-synopsis:           `conduit` done `ultra`, in practice this mostly is just about pulling out those damn exceptions and injecting them into `EitherT`.  "Best Practices" my ass FPComplete
+copyright:          Copyright (C) 2014-2018
+synopsis:           `conduit` done `ultra`, in practice this mostly is just about pulling out those damn exceptions and injecting them into `EitherT`.  "Best Practices" my ass FPComplete. This is for use with libraries which are still using conduit pre-1.3
 category:           Data
-description:        `conduit` done `ultra`, in practice this mostly is just about pulling out those damn exceptions and injecting them into `EitherT`.  "Best Practices" my ass FPComplete
+description:        `conduit` done `ultra`, in practice this mostly is just about pulling out those damn exceptions and injecting them into `EitherT`.  "Best Practices" my ass FPComplete. This is for use with libraries which are still using conduit pre-1.3
 homepage:           https://github.com/domdere/ultra
 bug-reports:        https://github.com/domdere/ultra/issues
 cabal-version:      >= 1.18
@@ -28,8 +28,8 @@ library
     build-depends:      base < 5 && >= 4
                     ,   containers
                     ,   array
-                    ,   conduit         == 1.3.*
-                    ,   conduit-extra   == 1.3.*
+                    ,   conduit         == 1.2.*
+                    ,   conduit-extra   == 1.1.*
                     ,   domdere-preamble
                     ,   ultra-either
                     ,   ultra-text
@@ -56,4 +56,4 @@ test-suite              quickcheck
     build-depends:      base                >= 4 && < 5
                     ,   domdere-preamble
                     ,   lab-core
-                    ,   ultra-conduit
+                    ,   ultra-conduit-legacy

@@ -1,6 +1,6 @@
 language: generic
 
-sudo: false
+sudo: required
 
 git:
   submodules: false
@@ -14,6 +14,7 @@ matrix:
   - env: GHCVER=8.0.2 CABALVER=1.24
     addons:
       apt:
+        update: true
         sources:
           - hvr-ghc
         packages:
@@ -22,26 +23,29 @@ matrix:
   - env: GHCVER=8.0.2 CABALVER=2.0
     addons:
       apt:
+        update: true
         sources:
           - hvr-ghc
         packages:
           - ghc-8.0.2
           - cabal-install-2.0
-  - env: GHCVER=8.2.1 CABALVER=1.24
+  - env: GHCVER=8.2.2 CABALVER=1.24
     addons:
       apt:
+        update: true
         sources:
           - hvr-ghc
         packages:
-          - ghc-8.2.1
+          - ghc-8.2.2
           - cabal-install-1.24
-  - env: GHCVER=8.2.1 CABALVER=2.0
+  - env: GHCVER=8.2.2 CABALVER=2.0
     addons:
       apt:
+        update: true
         sources:
           - hvr-ghc
         packages:
-          - ghc-8.2.1
+          - ghc-8.2.2
           - cabal-install-2.0
   # mafia doesnt build with ghc-8.4.1
   #- env: GHCVER=8.4.1 CABALVER=1.24
@@ -64,6 +68,7 @@ matrix:
   #  - env: GHCVER=head
 addons:
   apt:
+    update: true
     sources:
       - hvr-ghc
     packages:
