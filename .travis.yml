@@ -79,7 +79,7 @@ before_install:
   - export PATH=/opt/ghc/$GHCVER/bin:/opt/cabal/$CABALVER/bin:$PATH
 
 script:
-  - travis_wait 90 bin/ci
+  - timeout 35m bin/ci
 notifications:
   slack:
     secure: T2Io5mo5BdqVfpxgG8hwwuj3Wyh5cB9m65DKDKEQwrPu8gJMluKm/1MjYWPmyGUL4+bZLeupQ8nVYLlcD/lUGBMryBfjepPoZrAYCCJTWVpinQUoFATRU6fPfdOQJA+Z89EP3GBbNc5CO5nPIv4jsWi0+PoPP9zoNzGB3Irw9GXDEwNCAoE08E2IDKNS8gm0kD9z+GuNA3uozI75PcNDwJ+RhvEQTNfzqkNYOxTuIu5lgffOCyA+evdcSqVcR9l2TNPCX7/irfd9R09jfq0SQVFXWCwLwL7kqPydSRuBe5MMHYUjxctZV72K5RriVVLs+15V9fr9fzdFme77ZB+c9aR3PEr+7f870rhWSLFzFbkhHy6TfZpNMt2lBFRSYw57ZRPWtxmrIiAmPnn5nqzcSdpgoReZWucsHhbmXCZAkLKX1A3CUub7Q+sGVYkOY7Bq71DArTfAap52VUEdaFQ97mSFi1qi3KI/2ADKj4SWQ5YZJcStBNJs5XtA9MxgPujOXx35cEp4Ek1zudk24qMJdqtqh2jzJdC8TNFCJn8Lq8kkUPH/F9iijdM+mMosmyPHsYgpuB/E2jOkiWxCsQ1N2CFDQvWcKuWA6Pm9TzAeiPjkCpm3jI1oVse9QiqBvwk+RjYjbKaEtVuAglqEnef27KOuD3F+OVUu/txq2nIqORQ=
