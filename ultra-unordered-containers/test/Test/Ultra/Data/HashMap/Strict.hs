@@ -12,6 +12,94 @@ import Lab.Core.Hedgehog.TH
 
 import Preamble
 
+prop_hashMapDiff_update :: Property
+prop_hashMapDiff_update = property $ do
+  keys <- forAll $ Gen.nonEmpty
+    (Range.constant 1 100)
+    (Gen.int $ Range.constant 0 2000)
+  distinctKeys <- case nonEmpty . S.toList . S.fromList . toList $ keys of
+    Nothing -> annotate "Got empty list of distinct keys from non empty list of keys (impossible)" >> failure
+    Just x -> pure x
+  oldValues <- forM distinctKeys $ \key -> do
+    value <- forAll $ Gen.int (Range.constantFrom 0 (-1000) 1000)
+    pure (key, value)
+  -- pick a key to update
+  (key, oldVal) <- forAll . Gen.element $ oldValues
+  newVal <- forAll $ (/= oldVal) `Gen.filter` Gen.int (Range.constantFrom 0 (-1000) 1000)
+  let
+    oldHashMap :: H.HashMap Int Int
+    oldHashMap =
+      H.fromList . toList $ oldValues
+
+    newHashMap :: H.HashMap Int Int
+    newHashMap =
+      H.insert key newVal oldHashMap
+
+    expectedResult :: [H.HashMapChange Int Int Int]
+    expectedResult = pure $
+      H.HashMapKeyUpdate key oldVal newVal newVal
+  -- The type ensures that the hash function is used
+  -- to extract info from the input hash map of hashes,
+  -- So we can simplify the test by testing with the
+  -- identity hash function.
+  H.hashMapDiff id oldHashMap newHashMap === expectedResult
+
+prop_hashMapDiff_new :: Property
+prop_hashMapDiff_new = property $ do
+  keys <- forAll $ Gen.nonEmpty
+    (Range.constant 1 100)
+    (Gen.int $ Range.constant 0 2000)
+  distinctKeys <- case nonEmpty . S.toList . S.fromList . toList $ keys of
+    Nothing -> annotate "Got empty list of distinct keys from non empty list of keys (impossible)" >> failure
+    Just x -> pure x
+  oldValues <- forM distinctKeys $ \key -> do
+    value <- forAll $ Gen.int (Range.constantFrom 0 (-1000) 1000)
+    pure (key, value)
+  -- The other keys were chosen from the range 0-2000 so this should be guaranteed
+  -- to be new to the map...
+  newKey <- forAll $ Gen.int (Range.constantFrom 2500 2000 3000)
+  newValue <- forAll $ Gen.int (Range.constantFrom 0 (-1000) 1000)
+  let
+    oldHashMap =
+      H.fromList . toList $ oldValues
+    newHashMap =
+      H.insert newKey newValue oldHashMap
+
+    expectedResult = pure $
+      H.HashMapKeyNew newKey newValue newValue
+  -- The type ensures that the hash function is used
+  -- to extract info from the input hash map of hashes,
+  -- So we can simplify the test by testing with the
+  -- identity hash function.
+  H.hashMapDiff id oldHashMap newHashMap === expectedResult
+
+prop_hashMapDiff_delete :: Property
+prop_hashMapDiff_delete = property $ do
+  keys <- forAll $ Gen.nonEmpty
+    (Range.constant 1 100)
+    (Gen.int $ Range.constant 0 2000)
+  distinctKeys <- case nonEmpty . S.toList . S.fromList . toList $ keys of
+    Nothing -> annotate "Got empty list of distinct keys from non empty list of keys (impossible)" >> failure
+    Just x -> pure x
+  oldValues <- forM distinctKeys $ \key -> do
+    value <- forAll $ Gen.int (Range.constantFrom 0 (-1000) 1000)
+    pure (key, value)
+  -- pick a key to delete
+  (key, _) <- forAll . Gen.element $ oldValues
+  let
+    oldHashMap = H.fromList . toList $ oldValues
+
+    newHashMap = H.delete key oldHashMap
+
+    expectedResult = pure $
+      H.HashMapKeyDelete key
+  -- The type ensures that the hash function is used
+  -- to extract info from the input hash map of hashes,
+  -- So we can simplify the test by testing with the
+  -- identity hash function.
+  H.hashMapDiff id oldHashMap newHashMap === expectedResult
+
+
 prop_hashMapDiff2_update :: Property
 prop_hashMapDiff2_update = property $ do
   keys <- forAll $ Gen.nonEmpty

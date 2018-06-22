@@ -14,6 +14,7 @@ module Ultra.Data.HashMap.Strict (
   -- * Types
     , HashMapChange(..)
   -- * Functions
+  , hashMapDiff
   , hashMapDiff2
   ) where
 
@@ -30,6 +31,43 @@ data HashMapChange n h a =
   | HashMapKeyDelete !n -- ^ for keys that no longer exist
     deriving (Show, Eq)
 
+-- This takes a hashmap of values and a hashmap of hashes for a
+-- prior state, and determines which keys have changed value,
+-- which keys have been deleted and which new keys have been added.
+hashMapDiff
+  :: forall a h k. (Eq h, Eq k, Hashable k)
+  => (a -> h)               -- ^ The hash function
+  -> HashMap k h            -- ^ hashmap of hashes of old values
+  -> HashMap k a            -- ^ hashmap of new values
+  -> [HashMapChange k h a]  -- ^ Change List
+hashMapDiff hashFunction digests newValues =
+  let
+    newValuesAndHashes :: HashMap k (a, h)
+    newValuesAndHashes =
+      ((,) <$> id <*> hashFunction) <$> newValues
+
+    updatedValues :: [HashMapChange k h a]
+    updatedValues =
+      flip filteredBy (X.toList newValuesAndHashes) $ \(varName, (newProjVal, newProjHash)) ->
+        case lookup varName digests of
+          Nothing -> pure $ HashMapKeyNew varName newProjHash newProjVal
+          Just oldHash ->
+            if oldHash == newProjHash then
+              Nothing
+            else
+              pure $ HashMapKeyUpdate
+                varName
+                oldHash
+                newProjHash
+                newProjVal
+
+    deletedValues :: [HashMapChange k h a]
+    deletedValues = flip filteredBy (fmap fst . X.toList $ digests) $ \varName ->
+      case lookup varName newValuesAndHashes of
+        Nothing -> pure . HashMapKeyDelete $ varName
+        Just _  -> Nothing
+  in updatedValues <> deletedValues
+
 -- This looks what what is effectively a 2 tier
 -- hashmap (keyed first on @k@ and then on @n@
 -- And detects the following kinds of differences:
@@ -43,18 +81,13 @@ data HashMapChange n h a =
 -- Tracks changes to the @k@ keyed entities, including their removal.
 hashMapDiff2
   :: forall k n a h. (Eq k, Eq h, Eq n, Hashable n, Hashable k)
-  => (a -> h)
-  -> [(k, HashMap n h)]
-  -> [(k, HashMap n a)]
-  -> [(k, NonEmpty (HashMapChange n h a))]
+  => (a -> h) -- ^ hash function
+  -> [(k, HashMap n h)] -- ^ keyed hashmap of hashes
+  -> [(k, HashMap n a)] -- ^ keyed hashmap of new values
+  -> [(k, NonEmpty (HashMapChange n h a))] -- ^ change lists, only for keys with changes.
 hashMapDiff2 hashFunction digests newValues =
-  let
-    newValuesAndHashes :: HashMap k (HashMap n (a, h))
-    newValuesAndHashes =
-      (fmap . fmap) ((,) <$> id <*> hashFunction) . fromList $ newValues
-
-  in filteredBy (traverse nonEmpty) . flip fmap digests $ \(nm, digestStore') -> (,) nm $
-    case lookup nm newValuesAndHashes of
+  filteredBy (traverse nonEmpty) . flip fmap digests $ \(nm, digestStore') -> (,) nm $
+    case lookup nm . X.fromList $ newValues of
       -- If the key doesnt show up in
       -- the new values,
       -- then the value must have been deleted
@@ -62,26 +95,4 @@ hashMapDiff2 hashFunction digests newValues =
           fmap (HashMapKeyDelete . fst)
         . X.toList
         $ digestStore'
-      Just newProjValsAndHashes ->
-        let
-          updatedValues :: [HashMapChange n h a]
-          updatedValues =
-            flip filteredBy (X.toList newProjValsAndHashes) $ \(varName, (newProjVal, newProjHash)) ->
-              case lookup varName digestStore' of
-                Nothing -> pure $ HashMapKeyNew varName newProjHash newProjVal
-                Just oldHash ->
-                  if oldHash == newProjHash then
-                    Nothing
-                  else
-                    pure $ HashMapKeyUpdate
-                      varName
-                      oldHash
-                      newProjHash
-                      newProjVal
-
-          deletedValues :: [HashMapChange n h a]
-          deletedValues = flip filteredBy (fmap fst . X.toList $ digestStore') $ \varName ->
-            case lookup varName newProjValsAndHashes of
-              Nothing -> pure . HashMapKeyDelete $ varName
-              Just _  -> Nothing
-        in updatedValues <> deletedValues
+      Just newProjVals -> hashMapDiff hashFunction digestStore' newProjVals
