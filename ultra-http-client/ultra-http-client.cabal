@@ -30,7 +30,7 @@ library
                       , containers
                       , domdere-preamble
                       , http-client       >= 0.4 && < 0.6
-                      , http-types        == 0.9.*
+                      , http-types        == 0.12.*
                       , ultra-either
                       , ultra-exceptions
                       , ultra-text
@@ -40,6 +40,7 @@ library
     hs-source-dirs:     src
 
     exposed-modules:    Ultra.Network.HTTP.Client
+                        Ultra.Network.HTTP.Types
 
 test-suite              test
     default-language:   Haskell2010
