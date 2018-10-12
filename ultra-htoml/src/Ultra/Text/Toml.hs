@@ -1,6 +1,7 @@
 {-# LANGUAGE GeneralizedNewtypeDeriving #-}
 {-# LANGUAGE LambdaCase #-}
 {-# LANGUAGE NoImplicitPrelude #-}
+{-# LANGUAGE OverloadedLists #-}
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE StrictData #-}
 -------------------------------------------------------------------
@@ -24,6 +25,7 @@ module Ultra.Text.Toml (
   -- * Operators
   , (.:)
   , (.:?)
+  , (<||>)
   -- * Functions
   , asTomlArray
   , asTomlBool
@@ -54,15 +56,19 @@ data TomlError =
     CouldNotFindNode [T.Text] -- ^ The path that was searched, with the segments reversed...
   | InvalidNodeType [T.Text] T.Text Node -- ^ Path (segments reversed..) it was found at, expected type, the node that was found
   | AlternativeErrors (NonEmpty TomlError)
-  | EmptyFail -- ^ For the Monoid instance required for Alternative instance of the parser...
     deriving (Show, Eq)
+
+instance Semigroup TomlError where
+--(<>) :: a -> a -> a
+  (<>) (AlternativeErrors x) (AlternativeErrors y) = AlternativeErrors $ x <> y
+  (<>) (AlternativeErrors x) y = AlternativeErrors $ x <> pure y
+  (<>) x (AlternativeErrors y) = AlternativeErrors $ x :| toList y
+  (<>) x y = AlternativeErrors [x, y]
 
 renderTomlError :: TomlError -> T.Text
 renderTomlError (CouldNotFindNode path) = T.concat ["(Toml) expected to find node at <", renderPath path, "> but found nothing"]
 renderTomlError (InvalidNodeType path typ _) = T.concat ["(Toml) expecting a node of type ", typ, " at <", renderPath path, ">"]
 renderTomlError (AlternativeErrors errors) = T.bracketedList "(Toml) one of the following errors: [" "]" "|" . fmap renderTomlError . toList $ errors
-renderTomlError EmptyFail = "(Toml) error"
-
 
 renderPath :: [T.Text] -> T.Text
 renderPath = T.intercalate "." . reverse
@@ -109,6 +115,13 @@ data TomlArray = TomlArray {
   in pure
     . fmap (TomlNode newPath)
     $ H.lookup name tbl
+
+infixl 3 <||>
+
+(<||>) :: TomlParser a -> TomlParser a -> TomlParser a
+(TomlParser (Right x)) <||> _ = pure x
+_ <||> (TomlParser (Right x)) = pure x
+(TomlParser (Left e)) <||> (TomlParser (Left e2)) = TomlParser . Left $ e <> e2
 
 asTomlTable
   :: TomlNode
