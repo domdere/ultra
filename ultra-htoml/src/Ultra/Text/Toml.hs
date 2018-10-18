@@ -35,6 +35,7 @@ module Ultra.Text.Toml (
   , asTomlTableArray
   , getTomlTableEmptyIfAbsent
   , renderTomlError
+  , tomlNodes
   ) where
 
 import qualified Ultra.Data.Text as T
@@ -197,3 +198,8 @@ asTomlArray (TomlNode path node) =
       . toList
       $ a
     n -> TomlParser . Left $ InvalidNodeType path "Array" n
+
+tomlNodes :: TomlTable -> [(T.Text, TomlNode)]
+tomlNodes (TomlTable path hmap) = fmap (\(k, v) -> (k, TomlNode (k : path) v))
+ . H.toList
+ $ hmap
