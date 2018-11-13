@@ -8,10 +8,11 @@
 --
 -------------------------------------------------------------------
 module Ultra.Cli (
-    -- * Functions
-        renderErrorAndDie
-    ,   renderErrorAndDieWithErrorCode
-    ) where
+  -- * Functions
+    handleErrorAndDieWithErrorCode
+  , renderErrorAndDie
+  , renderErrorAndDieWithErrorCode
+  ) where
 
 import Ultra.Control.Monad.Trans.Either (EitherT, eitherT)
 import qualified Ultra.Data.Text as T
@@ -24,14 +25,17 @@ import Preamble
 
 renderErrorAndDie :: forall e a. (e -> T.Text) -> EitherT e IO a -> IO a
 renderErrorAndDie f =
-    let
-        handleError :: e -> IO a
-        handleError err = T.hPutStrLn stderr (f err) >> exitFailure
-    in eitherT handleError pure
+  let
+    handleError :: e -> IO a
+    handleError err = T.hPutStrLn stderr (f err) >> exitFailure
+  in eitherT handleError pure
+
+handleErrorAndDieWithErrorCode :: (e -> IO b) -> EitherT e IO a -> IO a
+handleErrorAndDieWithErrorCode f = eitherT (\e -> f e >> exitFailure) pure
 
 renderErrorAndDieWithErrorCode :: forall e a. (e -> (T.Text, Int)) -> EitherT e IO a -> IO a
 renderErrorAndDieWithErrorCode f =
-    let
-        handleError :: e -> IO a
-        handleError err = let (msg, exitCode) = f err in T.hPutStrLn stderr msg >> exitWith (ExitFailure exitCode)
-    in eitherT handleError pure
+  let
+    handleError :: e -> IO a
+    handleError err = let (msg, exitCode) = f err in T.hPutStrLn stderr msg >> exitWith (ExitFailure exitCode)
+  in eitherT handleError pure
