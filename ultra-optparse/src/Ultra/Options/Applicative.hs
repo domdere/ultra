@@ -14,20 +14,28 @@ module Ultra.Options.Applicative (
     module X
   -- * Functions
   , command'
-  , commandParser
   , parseAndRun
-  , dryrun
   , eitherTextReader
   , enumWithDefaultP
   , envvar
   , envvarWithDefault
   , envvarWithDefaultWithRender
   , shimTextParser
+
+  -- * Safe Command
+  , SafeCommand (..)
+  , runSafeCommand
+  , safeCommand
+
+  -- * Parser flags
   , bverbosity
+  , dependency
+  , dryrun
   , verbosity
+  , version
   ) where
 
-import Ultra.Cli.Data (BinaryVerbosity(..), Verbosity(..), DryRun(..))
+import Ultra.Cli.Data (BinaryVerbosity (..), DryRun (..), Verbosity (..))
 import qualified Ultra.Data.Text as T
 
 import qualified Data.List as L
@@ -35,15 +43,12 @@ import Options.Applicative as X
 
 import System.Environment (getArgs)
 
+import System.IO (print, putStrLn)
+
 import Preamble
 
 command' :: T.Text -> T.Text -> Parser a -> Mod CommandFields a
 command' name description parser = command (T.unpack name) (info (parser <**> helper) (progDesc . T.unpack $ description))
-
-commandParser :: a -> [Mod CommandFields a] -> Parser a
-commandParser versionCommand cs =
-      flag' versionCommand (short 'v' <> long "version" <> help "version info.")
-  <|> (subparser $ foldr (<>) mempty cs)
 
 parseAndRun
   :: T.Text
@@ -62,8 +67,8 @@ parseAndRun h desc p f =
     case x of
       -- If there were no commands, and the flags (the only valids ones in this case should be --version/-v and --help)
       -- are not recognised, then show the help msg.
-      []  -> customExecParser (prefs showHelpOnError) (info (p <**> helper) topMods) >>= f
-      _   -> execParser (info (p <**> helper) topMods) >>= f
+      [] -> customExecParser (prefs showHelpOnError) (info (p <**> helper) topMods) >>= f
+      _  -> execParser (info (p <**> helper) topMods) >>= f
 
 
 enumWithDefaultP :: forall a. (Eq a) => a -> NonEmpty (a, T.Text, T.Text) -> Parser a
@@ -137,6 +142,34 @@ envvar' ifEmpty f envs env h =
     , ")"
     ]
 
+-- | Safe Command with a dry-run mode, a dependencies and a version flag
+data SafeCommand a =
+    VersionCommand
+  | DependencyCommand
+  | RunCommand DryRun a
+  deriving (Eq, Show)
+
+-- | Run Safe Command
+runSafeCommand :: Show t => SafeCommand t -> String -> String -> (t -> IO ()) -> IO ()
+runSafeCommand sc v d b = case sc of
+  VersionCommand ->
+    putStrLn v
+  DependencyCommand ->
+    putStrLn d
+  RunCommand DryRun c ->
+    print c
+  RunCommand RealDeal c ->
+    b c
+
+-- | Turn a Parser for a command of type a into a safe command
+--   with a dry-run mode and a version flag
+safeCommand :: Parser a -> Parser (SafeCommand a)
+safeCommand commandParser =
+      VersionCommand <$ version
+  <|> DependencyCommand <$ dependency
+  <|> RunCommand <$> dryrun <*> commandParser
+
+
 bverbosity :: Parser BinaryVerbosity
 bverbosity = flag BQuiet BVerbose $
       long "verbose"
@@ -149,7 +182,20 @@ verbosity = option (Verbose <$> auto) $
   <>  metavar "INT"
   <>  help "run verbosely"
 
+-- | Flag for dry-run
 dryrun :: Parser DryRun
 dryrun = flag RealDeal DryRun $
       long "dry-run"
   <>  help "if set, suppresses any I/O that would make any persistent changes"
+
+-- | Flag for listing dependencies.
+dependency :: Parser ()
+dependency = flag' () $
+       long "dependencies"
+    <> hidden
+
+version :: Parser ()
+version = flag' () $
+       short 'v'
+    <> long "version"
+    <> help "version info."
