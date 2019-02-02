@@ -29,7 +29,7 @@ library
                     ,   containers
                     ,   array
                     ,   domdere-preamble
-                    ,   exceptions      == 0.8.*
+                    ,   exceptions      == 0.10.*
 
     ghc-options:        -Wall
 
