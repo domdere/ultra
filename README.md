@@ -8,6 +8,8 @@ If I have functions and such that I wish to add to an existing library and I wan
 
 ### Using git and mafia?
 
+Foo
+
 Drop the [`mafia`](https://github.com/haskell-mafia/mafia) script next to your cabal file:
 
 ``` shell
