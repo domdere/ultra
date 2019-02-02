@@ -29,7 +29,7 @@ library
                     ,   containers
                     ,   array
                     ,   domdere-preamble
-                    ,   exceptions              == 0.8.*
+                    ,   exceptions              == 0.10.*
                     ,   ultra-core
                     ,   ultra-either
                     ,   ultra-text
@@ -49,7 +49,7 @@ test-suite              quickcheck
     hs-source-dirs:     test
     build-depends:      base                >= 4 && < 5
                     ,   domdere-preamble
-                    ,   exceptions          == 0.8.*
+                    ,   exceptions          == 0.10.*
                     ,   lab-core
                     ,   ultra-either
                     ,   ultra-exceptions
