@@ -1,5 +1,7 @@
 # ultra [![Build Status](https://img.shields.io/travis/domdere/ultra.svg?style=flat)](https://travis-ci.org/domdere/ultra)
 
+foo
+
 ![ultra](etc/ultra.png)
 
 If I have functions and such that I wish to add to an existing library and I want to give them a trial period to see if they are really useful before committing myself to submitting a PR for the library itself, I'll put it in a project here first.
