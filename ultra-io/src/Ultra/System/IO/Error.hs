@@ -56,7 +56,7 @@ renderDirectoryCreateError :: DirectoryCreateError -> T.Text
 renderDirectoryCreateError (DirectoryParentsDontExist dn)   = T.concat ["could not create directory, one of the parent directories is missing: '", dn, "'"]
 renderDirectoryCreateError (DirectoryCreateOther err)       = renderDirectoryRecursiveCreateError err
 
-data RemoveDirectoryRecursiveError = RemoveDirectoryRecursiveNotADirectory T.Text deriving (Show, Eq)
+newtype RemoveDirectoryRecursiveError = RemoveDirectoryRecursiveNotADirectory T.Text deriving (Show, Eq)
 
 renderRemoveDirectoryRecursiveError :: RemoveDirectoryRecursiveError -> T.Text
 renderRemoveDirectoryRecursiveError (RemoveDirectoryRecursiveNotADirectory dname) = T.concat ["Cannot remove directory, it is not a directory: '", dname, "'"]

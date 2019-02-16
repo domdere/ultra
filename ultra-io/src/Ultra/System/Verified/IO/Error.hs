@@ -56,7 +56,7 @@ renderVerifiedFileOpenError :: VerifiedFileOpenError -> T.Text
 renderVerifiedFileOpenError (VerifiedFileAlreadyInUse fn)       = T.concat ["file already in use: '", fn, "'"]
 renderVerifiedFileOpenError (VerifiedFilePermissionError m fn)  = T.concat ["file permissions do not permit ", (T.pack . show) m, " operation on '", fn, "'"]
 
-data NewFileOpenError = NewFilePermissionError T.Text deriving (Show, Eq)
+newtype NewFileOpenError = NewFilePermissionError T.Text deriving (Show, Eq)
 
 renderNewFileOpenError :: NewFileOpenError -> T.Text
 renderNewFileOpenError (NewFilePermissionError fn) = T.concat ["file permissions do not permit creating and writing file: '", fn, "'"]
