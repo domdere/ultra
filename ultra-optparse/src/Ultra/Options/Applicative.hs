@@ -111,7 +111,7 @@ envvarWithDefault
   -> a
   -> T.Text
   -> X.Mod f a
-envvarWithDefault f envs env def h = envvar' (value def <> showDefault) f envs env h
+envvarWithDefault f envs env def = envvar' (value def <> showDefault) f envs env
 
 envvarWithDefaultWithRender
   :: (HasValue f)
@@ -122,7 +122,7 @@ envvarWithDefaultWithRender
   -> a
   -> T.Text
   -> X.Mod f a
-envvarWithDefaultWithRender f render envs env def h = envvar' (value def <> showDefaultWith (T.unpack . render)) f envs env h
+envvarWithDefaultWithRender f render envs env def = envvar' (value def <> showDefaultWith (T.unpack . render)) f envs env
 
 envvar'
   :: (HasValue f)
