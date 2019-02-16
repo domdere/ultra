@@ -27,7 +27,7 @@ infixl 7 %!
 infixl 7 %?
 
 (%!) :: (Integral a) => a -> NonZero a -> Ratio a
-num %! denom = num % (getNonZero denom)
+num %! denom = num % getNonZero denom
 
 (%?) :: (Integral a) => a -> a -> Maybe (Ratio a)
 num %? denom = (num %!) <$> nonZero denom
