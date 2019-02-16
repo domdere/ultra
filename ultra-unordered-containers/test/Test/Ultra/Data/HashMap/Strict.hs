@@ -10,6 +10,8 @@ import qualified Lab.Core.Hedgehog.Gen as Gen
 import qualified Lab.Core.Hedgehog.Range as Range
 import Lab.Core.Hedgehog.TH
 
+import Data.Hashable (Hashable)
+
 import Preamble
 
 prop_hashMapDiff_update :: Property
@@ -102,24 +104,9 @@ prop_hashMapDiff_delete = property $ do
 
 prop_hashMapDiff2_update :: Property
 prop_hashMapDiff2_update = property $ do
-  keys <- forAll $ Gen.nonEmpty
-    (Range.constant 1 100)
-    (Gen.int $ Range.constant 0 2000)
-  distinctKeys <- case nonEmpty . S.toList . S.fromList . toList $ keys of
-    Nothing -> annotate "Got empty list of distinct keys from non empty list of keys (impossible)" >> failure
-    Just x -> pure x
-  oldValues <- forM distinctKeys $ \key -> do
-    keys2 <- forAll $ Gen.nonEmpty
-      (Range.constant 1 100)
-      (Gen.int $ Range.constant 0 2000)
-    let distinctKeys2 = S.toList . S.fromList . toList $ keys2
-    subMapList <-forM distinctKeys2 $ \key2 -> do
-      value <- forAll $ Gen.int (Range.constantFrom 0 (-1000) 1000)
-      pure (key2, value)
-    pure (key, H.fromList subMapList)
-  let oldHashMap = H.fromList . toList $ oldValues
   -- pick a key to update
-  (key, map2) <- forAll . Gen.element $ oldValues
+  (key, map2, oldValues) <- hashMapDiff2KeysAndMaps 
+  let oldHashMap = H.fromList . toList $ oldValues
   map2Entries <- case nonEmpty . H.toList $ map2 of
     Nothing -> annotate "second level map is empty..." >> failure
     Just x -> pure x
@@ -145,8 +132,9 @@ prop_hashMapDiff2_update = property $ do
   -- identity hash function.
   H.hashMapDiff2 id (toList oldValues) (H.toList newHashMap) === expectedResult
 
-prop_hashMapDiff2_delete1 :: Property
-prop_hashMapDiff2_delete1 = property $ do
+hashMapDiff2KeysAndMaps
+  :: PropertyT IO (Int, H.HashMap Int Int, NonEmpty (Int, H.HashMap Int Int))
+hashMapDiff2KeysAndMaps = do
   keys <- forAll $ Gen.nonEmpty
     (Range.constant 1 100)
     (Gen.int $ Range.constant 0 2000)
@@ -162,9 +150,14 @@ prop_hashMapDiff2_delete1 = property $ do
       value <- forAll $ Gen.int (Range.constantFrom 0 (-1000) 1000)
       pure (key2, value)
     pure (key, H.fromList subMapList)
-  let oldHashMap = H.fromList . toList $ oldValues
-  -- pick a key to delete
   (key, map2) <- forAll . Gen.element $ oldValues
+  pure (key, map2, oldValues)
+
+prop_hashMapDiff2_delete1 :: Property
+prop_hashMapDiff2_delete1 = property $ do
+  -- pick a key to delete
+  (key, map2, oldValues) <- hashMapDiff2KeysAndMaps 
+  let oldHashMap = H.fromList . toList $ oldValues
   map2Keys <- case nonEmpty . fmap fst . H.toList $ map2 of
     Nothing -> annotate "second level map is empty..." >> failure
     Just x -> pure x
@@ -180,23 +173,9 @@ prop_hashMapDiff2_delete1 = property $ do
 
 prop_hashMapDiff2_delete2 :: Property
 prop_hashMapDiff2_delete2 = property $ do
-  keys <- forAll $ Gen.nonEmpty
-    (Range.constant 1 100)
-    (Gen.int $ Range.constant 0 2000)
-  distinctKeys <- case nonEmpty . S.toList . S.fromList . toList $ keys of
-    Nothing -> annotate "Got empty list of distinct keys from non empty list of keys (impossible)" >> failure
-    Just x -> pure x
-  oldValues <- forM distinctKeys $ \key -> do
-    keys2 <- forAll $ Gen.nonEmpty
-      (Range.constant 1 100)
-      (Gen.int $ Range.constant 0 2000)
-    let distinctKeys2 = S.toList . S.fromList . toList $ keys2
-    subMapList <-forM distinctKeys2 $ \key2 -> do
-      value <- forAll $ Gen.int (Range.constantFrom 0 (-1000) 1000)
-      pure (key2, value)
-    pure (key, H.fromList subMapList)
-  let oldHashMap = H.fromList . toList $ oldValues
   -- pick a key to delete
+  (key, map2, oldValues) <- hashMapDiff2KeysAndMaps
+  let oldHashMap = H.fromList . toList $ oldValues
   (key, map2) <- forAll . Gen.element $ oldValues
   map2Entries <- case nonEmpty . H.toList $ map2 of
     Nothing -> annotate "second level map is empty..." >> failure
@@ -258,4 +237,4 @@ prop_hashMapDiff2_new2 = property $ do
   H.hashMapDiff2 id (toList oldValues) (H.toList newHashMap) === expectedResult
 
 tests :: IO Bool
-tests = checkParallel $$(discover)
+tests = checkParallel $$discover

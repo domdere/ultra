@@ -46,9 +46,10 @@ test-suite              test
     main-is:            test.hs
     hs-source-dirs:     test
     build-depends:      base                >= 4 && < 5
-                    ,   domdere-preamble
-                    ,   lab-hedgehog-core
-                    ,   ultra-unordered-containers
-                    ,   unordered-containers      == 0.2.*
+                      , domdere-preamble
+                      , hashable                  == 1.2.*
+                      , lab-hedgehog-core
+                      , ultra-unordered-containers
+                      , unordered-containers      == 0.2.*
 
     other-modules:      Test.Ultra.Data.HashMap.Strict
