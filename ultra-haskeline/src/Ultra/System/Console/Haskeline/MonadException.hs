@@ -46,4 +46,4 @@ instance (MonadException m) => MonadException (MEitherT e m) where
       MEitherT . EitherT $ controlIO $ \(RunIO run) ->
         let
           run' = RunIO (fmap (MEitherT . EitherT) . run . runEitherT . unMEitherT)
-        in fmap (runEitherT . unMEitherT) $ f run'
+        in runEitherT . unMEitherT <$> f run'
