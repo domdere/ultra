@@ -21,7 +21,7 @@ prop_bracketed open close body = T.bracketed open close body === (open <> body <
 
 prop_bracketedList :: T.Text -> T.Text -> T.Text -> [T.Text] -> Property
 prop_bracketedList open close sepBy body =
-    T.bracketedList open close sepBy body === (open <> (T.intercalate sepBy body) <> close)
+    T.bracketedList open close sepBy body === (open <> T.intercalate sepBy body <> close)
 
 return []
 tests :: IO Bool

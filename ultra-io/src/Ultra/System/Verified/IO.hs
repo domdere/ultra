@@ -234,7 +234,7 @@ createDirectory
     => T.Text
     -> EitherT NewDirError m VerifiedDirPath
 createDirectory dirName = do
-    (liftIO $ D.createDirectory (T.unpack dirName)) `catch` (newDirErrorHandler dirName)
+    liftIO (D.createDirectory (T.unpack dirName)) `catch` newDirErrorHandler dirName
     pure . VerifiedDirPath $ dirName
 
 -- |
@@ -259,7 +259,7 @@ createDirectoryIfMissing s dn =
             CreateDirectoryParents      -> True
             DoNotCreateDirectoryParents -> False
     in do
-        (liftIO $ D.createDirectoryIfMissing b (T.unpack dn)) `catch` (newDirIfMissingErrorHandler dn)
+        liftIO (D.createDirectoryIfMissing b (T.unpack dn)) `catch` newDirIfMissingErrorHandler dn
         pure . VerifiedDirPath $ dn
 
 removeVerifiedDirectoryRecursive
@@ -271,7 +271,7 @@ removeVerifiedDirectoryRecursive v =
         p :: T.Text
         p = verifiedDirPath v
     in do
-        (liftIO $ D.removeDirectoryRecursive (T.unpack p)) `catch` (removeVerifiedDirHandler p)
+        liftIO (D.removeDirectoryRecursive (T.unpack p)) `catch` removeVerifiedDirHandler p
         pure . UnusedPath $ p
 
 withTempDir
@@ -287,7 +287,7 @@ withTempDir parent dirPrefix f =
 
         findDirName :: Int32 -> m UnusedPath
         findDirName pid =
-          (runEitherT $ doesNotExist (T.concat [p, "/", dirPrefix, T.pack . show $ pid]) pure) >>=
+          runEitherT (doesNotExist (T.concat [p, "/", dirPrefix, T.pack . show $ pid]) pure) >>=
             either (const $ findDirName (pid + 1)) pure
     in bimapEitherT WithTempDirError snd $ strictBracketEitherT
         (do

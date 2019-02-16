@@ -276,7 +276,7 @@ stateTBracket svb acquire release use =
 -- MonadBracket functions
 
 vbracket :: (MonadBracket m) => VBracket m
-vbracket acquire release use = svbracket acquire (const release) use
+vbracket acquire release = svbracket acquire (const release)
 
 -- | Generalized abstracted pattern of safe resource acquisition and release
 -- in the face of exceptions and EitherT errors. The first action \"acquires\" some value, which
@@ -305,7 +305,7 @@ evbracket
   -> (a -> EitherT e m c) -- ^ @release@
   -> (a -> EitherT e m b) -- ^ @use@
   -> EitherT e m (c, b)
-evbracket acquire release use = esvbracket svbracket acquire (const release) use
+evbracket acquire release = esvbracket svbracket acquire (const release)
 
 bracket' :: (MonadBracket m) => m a -> (a -> m c) -> (a -> m b) -> m b
 bracket' acquire release use = snd <$> vbracket acquire release use

@@ -71,7 +71,7 @@ prop_jsonTextEnum_fail =
     tags = do
       listSize <- fromIntegral <$> choose (0, 39 :: Int)
       testTag <- textOf1 alphaNumChars
-      ts <- distinctListOfN1 listSize ((textOf1 alphaNumChars) `suchThat` (/= testTag))
+      ts <- distinctListOfN1 listSize (textOf1 alphaNumChars `suchThat` (/= testTag))
       ts' <- forM ts $ \x -> (,) x <$> arbitrary
       pure (ts', testTag)
   in forAll tags $ \(tags', tagToCheck) ->

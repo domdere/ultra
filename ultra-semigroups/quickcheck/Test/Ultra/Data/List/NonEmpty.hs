@@ -21,7 +21,7 @@ prop_groupBy2_groupBy xs =
     let
         diag :: a -> (a, a)
         diag = (,) <$> id <*> id
-    in (snd <$> groupBy2 diag xs) === groupBy (==) xs
+    in (snd <$> groupBy2 diag xs) === group xs
 
 return []
 tests :: IO Bool

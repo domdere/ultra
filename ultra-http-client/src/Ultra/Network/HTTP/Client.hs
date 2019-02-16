@@ -61,7 +61,7 @@ httpClientResponse resp = case responseStatus resp of
     -- hence im not routing them through to HttpOk,
     -- if we get a 3XX response, its because it broke the max redirects,
     -- in which case things are probably not OK
-    if (statusCode' < 300 && statusCode' >= 200) then HttpOk resp else HttpNotOk resp
+    if statusCode' < 300 && statusCode' >= 200 then HttpOk resp else HttpNotOk resp
 
 optionalHttpClientResponse :: Response a -> Maybe (HttpClientResponse a)
 optionalHttpClientResponse resp = case responseStatus resp of
@@ -71,7 +71,7 @@ optionalHttpClientResponse resp = case responseStatus resp of
   -- in which case things are probably not OK
   Status statusCode' _ | statusCode' == 404                       -> Nothing
   Status statusCode' _ | statusCode' < 300 && statusCode' >= 200  -> pure $ HttpOk resp
-  _                    | otherwise                                -> pure $ HttpNotOk resp
+  _                                                               -> pure $ HttpNotOk resp
 
 -- | For use adapting "exception" style code
 --

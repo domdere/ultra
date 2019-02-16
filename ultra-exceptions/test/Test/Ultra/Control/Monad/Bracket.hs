@@ -57,7 +57,7 @@ testVbracket vbracket' openResult releaseResult useResult =
         useFail _ = error "useFail"
 
         checkFailz :: String -> IO a -> IO Property
-        checkFailz err mx = ((failWith "Unexpected pass") <$ mx) `catch` (\(ErrorCall s) -> pure $ s === err)
+        checkFailz err mx = (failWith "Unexpected pass" <$ mx) `catch` (\(ErrorCall s) -> pure $ s === err)
 
     in conjoin . fmap ioProperty $ [
             (=== (releaseResult, useResult)) <$> vbracket' openSuccess releaseSuccess useSuccess
