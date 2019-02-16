@@ -37,7 +37,7 @@ jsonDispatchOnText cases v =
   in do
     t <- parseJSON v
     foldr
-      (\(t', p') p -> if (t == t') then p' else p)
+      (\(t', p') p -> if t == t' then p' else p)
       (fail . T.unpack . errorText $ t)
       cases
 
