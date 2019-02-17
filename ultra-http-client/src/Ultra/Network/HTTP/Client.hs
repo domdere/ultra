@@ -1,4 +1,5 @@
 {-# LANGUAGE NoImplicitPrelude #-}
+{-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE ScopedTypeVariables #-}
 module Ultra.Network.HTTP.Client (
   -- * re-exports
@@ -17,6 +18,7 @@ module Ultra.Network.HTTP.Client (
   , tryParsingBody
   , checkResponseStatus
   , jsonError
+  , renderHttpClientError
   ) where
 
 import Ultra.Control.Monad.Catch (MonadCatch(..), throwM)
@@ -50,6 +52,15 @@ data HttpClientResponse a =
     HttpNotOk !(Response a)
   | HttpOk !(Response a)
     deriving (Show, Eq)
+
+renderHttpClientError
+  :: (Show c)
+  => (b -> T.Text)
+  -> HttpClientError b c
+  -> T.Text
+renderHttpClientError _ (HttpError e) = T.concat ["HTTP Error: ", T.pack . show $ e]
+renderHttpClientError f (BodyParseError e) = T.concat ["Error parsing the body: ", f e]
+renderHttpClientError _ (NotOkHttpResponse r) = T.concat ["Received Error Response: ", T.pack . show $ r]
 
 jsonError :: String -> JSONBodyParseError
 jsonError = JSONBodyParseError . T.pack
